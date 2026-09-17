@@ -38,7 +38,5 @@ Upstream-проекты (AIT-IES/FMITerminalBlock, fmipp) не форкалис�
 `cmake_minimum_required(3.1)` upstream), `-DBUILD_SWIG=OFF -DBUILD_TESTS=OFF
 -DFMITerminalBlock_BUILD_TESTS=OFF`. Всё это зашито в `scripts/setup.sh`.
 
-## Новые файлы 
 
-`scripts/*`, `app/*`, `models/Tank.fmu.dir` (готовый FMU), `ИНСТРУКЦИЯ.md`, `README.md`, `PATCHES.md`.
 
