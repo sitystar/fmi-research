@@ -33,15 +33,15 @@
 
 ```bash
 # машина сборки (однократно): sudo apt install -y python3-tk python3-pip binutils
-packaging/build_deb.sh                          # → dist/fmi-coupling-gui_1.0.0_amd64.deb
+packaging/build_deb.sh                          # → dist/fmi-coupling-gui_1.х.х_amd64.deb
 sudo apt install ./dist/fmi-coupling-gui_*_amd64.deb   # на любой машине
 ```
 
-Пакет **самодостаточен**: связыватель FMITerminalBlock со всеми библиотеками
+Пакет самодостаточен: связыватель FMITerminalBlock со всеми библиотеками
 устанавливается в `/opt/fmi-coupling/fmitb`. Модели и trace живут в рабочем
 каталоге пользователя `~/fmi-coupling` (создаётся при первом запуске; путь и
 `FMI_RESEARCH_HOME` для разработки — кнопка «Сменить каталог»). Правило то же:
-Flogic (IEC 61499, forte) запускает только оркестратор, приложение управляет лишь FMITerminalBlock.
+Flogic (IEC 61499, forte) запускает пользователь самостоятельнл, приложение управляет лишь FMITerminalBlock.
 
 ## CI/CD (GitHub Actions)
 
@@ -60,7 +60,6 @@ Run workflow); артефакты скачиваются на странице �
 git clone <этот-репозиторий> && cd fmi-research
 scripts/setup.sh          # зависимости, Boost, сборка FMITerminalBlock (~5–10 минут)
 ```
-
 `setup.sh` сам выберет Boost: системный (`sudo apt install libboost-log-dev
 libboost-thread-dev libboost-filesystem-dev libboost-date-time-dev
 libboost-regex-dev`) или локальный без root (`scripts/fetch_boost.sh <версия>`).
