@@ -1,0 +1,108 @@
+# CI/CD: сборка всех компонентов fmi-research. Автор: Evgenii I, 2026
+#
+# Джобы (артефакты скачиваются на странице запуска Workflow → Artifacts):
+#   fmitb     — FMITerminalBlock + fmipp (патчи в репозитории) + бандл boost-библиотек
+#   gui-deb   — десктопное приложение: .deb (python/tkinter упакованы внутрь)
+#   smoke     — проверка: бинарник грузится, FMU читается, каналы доходят до FORTE
+#
+# Джобы идут в контейнерах ubuntu:25.10 — ровно та связка версий
+# (Boost 1.90 / CMake 4 / GCC 15), на которой проект проверен локально.
+
+name: build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  fmitb:
+    name: FMITerminalBlock (+fmipp)
+    runs-on: ubuntu-latest
+    container: ubuntu:25.10
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Зависимости
+        run: >
+          apt-get update -qq && apt-get install -y -qq
+          git build-essential cmake unzip
+          libboost-log-dev libboost-thread-dev libboost-filesystem-dev
+          libboost-date-time-dev libboost-regex-dev
+      - uses: actions/checkout@v4
+      - name: Сборка
+        run: |
+          cmake -S FMITerminalBlock -B build-fmitb \
+            -Dfmipp_PROJECT_DIR=$GITHUB_WORKSPACE/fmipp \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SWIG=OFF -DBUILD_TESTS=OFF -DFMITerminalBlock_BUILD_TESTS=OFF
+          cmake --build build-fmitb -j"$(nproc)"
+      - name: Бандл (бинарник + libboost рядом — запуск без установки)
+        run: |
+          mkdir -p dist/fmitb
+          cp build-fmitb/FMITerminalBlock dist/fmitb/
+          ldd build-fmitb/FMITerminalBlock \
+            | grep -oE '/[^ ]*lib(boost|fmipp)[^ ]*\.so[^ ]*' | xargs -r -I{} cp {} dist/fmitb/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fmitb
+          path: dist/fmitb/
+          retention-days: 30
+
+  gui-deb:
+    name: GUI .deb
+    needs: [fmitb]
+    runs-on: ubuntu-latest
+    container: ubuntu:25.10
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - name: Зависимости
+        run: >
+          apt-get update -qq && apt-get install -y -qq
+          git python3 python3-tk python3-pip binutils file
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: fmitb, path: dist/fmitb }
+      - name: Сборка .deb
+        run: |
+          export FMI_GUI_PY=/usr/bin/python3
+          export FMI_GUI_PIP_OPTS="--break-system-packages"
+          export FMI_FMITB_DIR=$GITHUB_WORKSPACE/dist/fmitb
+          packaging/build_deb.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gui-deb
+          path: dist/*.deb
+          retention-days: 30
+
+  smoke:
+    name: Дымовой тест
+    needs: [fmitb]
+    runs-on: ubuntu-latest
+    container: ubuntu:25.10
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - run: apt-get update -qq && apt-get install -y -qq git
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: fmitb, path: dist/fmitb }
+      - name: Бинарник запускается (usage)
+        run: |
+          ls -la dist/fmitb || true
+          chmod +x dist/fmitb/FMITerminalBlock
+          export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/dist/fmitb
+          ./dist/fmitb/FMITerminalBlock > /tmp/out.log 2>&1 || true
+          grep -q "Usage" /tmp/out.log || { echo '--- out.log: ---'; cat /tmp/out.log; exit 1; }
+      - name: FMU загружается (без FORTE ждём честный Connection refused)
+        run: |
+          export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/dist/fmitb
+          timeout 30 ./dist/fmitb/FMITerminalBlock \
+            fmu.path=file://$GITHUB_WORKSPACE/models/Tank.fmu.dir \
+            fmu.name=Tank app.startTime=0 app.lookAheadTime=1 \
+            in.0.0=u in.0.0.type=0 in.0.protocol=CompactASN.1-TCP in.0.addr=127.0.0.1:1500 \
+            out.0.0=height out.0.0.type=0 out.0.protocol=CompactASN.1-TCP out.0.addr=127.0.0.1:1499 \
+            app.dataFile=/tmp/data.csv > /tmp/fmu.log 2>&1 || true
+          grep -qi "connection refused" /tmp/fmu.log || { echo '--- fmu.log: ---'; cat /tmp/fmu.log; exit 1; }

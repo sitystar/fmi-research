@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System Name="fmi_tank">
+	<VersionInfo Version="1.0" Author="evg" Date="2026-09-02">
+	</VersionInfo>
+	<Application Name="fmi_tankApp">
+		<SubAppNetwork>
+			<FB Name="FROM_FMITB" Type="SERVER_1" x="-800" y="-700">
+				<Parameter Name="QI" Value="TRUE"/>
+				<Parameter Name="ID" Value="&quot;localhost:1499&quot;"/>
+			</FB>
+			<FB Name="CONV" Type="LREAL2LREAL" x="1300" y="-500">
+			</FB>
+			<FB Name="LT4" Type="F_LT" x="2400" y="100">
+				<Parameter Name="IN2" Value="LREAL#4.0"/>
+			</FB>
+			<FB Name="GT8" Type="F_GT" x="2400" y="1400">
+				<Parameter Name="IN2" Value="LREAL#8.0"/>
+			</FB>
+			<FB Name="FB_RS" Type="FB_RS" x="3500" y="500">
+			</FB>
+			<FB Name="F_SEL" Type="F_SEL" x="4600" y="500">
+				<Parameter Name="IN0" Value="LREAL#0.0"/>
+				<Parameter Name="IN1" Value="LREAL#1.0"/>
+			</FB>
+			<FB Name="TO_FMITB" Type="SERVER_1" x="7300" y="-700">
+				<Parameter Name="QI" Value="TRUE"/>
+				<Parameter Name="ID" Value="&quot;localhost:1500&quot;"/>
+			</FB>
+			<FB Name="E_CYCLE" Type="E_CYCLE" x="-200" y="500">
+				<Parameter Name="DT" Value="T#200ms"/>
+			</FB>
+			<FB Name="LREAL2LREAL" Type="LREAL2LREAL" x="5800" y="500">
+			</FB>
+			<EventConnections>
+				<Connection Source="E_CYCLE.EO" Destination="CONV.REQ" dx1="347.06"/>
+				<Connection Source="CONV.CNF" Destination="LT4.REQ" dx1="158.82"/>
+				<Connection Source="LT4.CNF" Destination="GT8.REQ" dx1="70.59" dx2="70.59" dy="500"/>
+				<Connection Source="GT8.CNF" Destination="FB_RS.REQ" dx1="241.18"/>
+				<Connection Source="FB_RS.CNF" Destination="F_SEL.REQ"/>
+				<Connection Source="F_SEL.CNF" Destination="LREAL2LREAL.REQ"/>
+				<Connection Source="FROM_FMITB.INITO" Destination="TO_FMITB.INIT"/>
+				<Connection Source="LREAL2LREAL.CNF" Destination="TO_FMITB.RSP" dx1="311.76"/>
+			</EventConnections>
+			<DataConnections>
+				<Connection Source="FROM_FMITB.RD_1" Destination="CONV.IN" dx1="388.24"/>
+				<Connection Source="CONV.OUT" Destination="LT4.IN1" dx1="158.82"/>
+				<Connection Source="CONV.OUT" Destination="GT8.IN1" dx1="123.53"/>
+				<Connection Source="LT4.OUT" Destination="FB_RS.S" dx1="382.35"/>
+				<Connection Source="GT8.OUT" Destination="FB_RS.R1" dx1="382.35"/>
+				<Connection Source="FB_RS.Q1" Destination="F_SEL.G"/>
+				<Connection Source="F_SEL.OUT" Destination="LREAL2LREAL.IN"/>
+				<Connection Source="LREAL2LREAL.OUT" Destination="TO_FMITB.SD_1" dx1="411.76"/>
+			</DataConnections>
+		</SubAppNetwork>
+	</Application>
+	<Device Name="FLOGIC_PC" Type="iec61499::system::FLOGIC_PC" x="2588.24" y="1629.41">
+		<Parameter Name="MGR_ID" Value="&quot;localhost:61499&quot;" Comment="Device manager socket ID"/>
+		<Attribute Name="Profile" Type="STRING" Value="HOLOBLOC"/>
+		<Attribute Name="Color" Type="STRING" Value="255,190,111"/>
+		<Resource Name="FLOGIC_EMB_RES" Type="FLOGIC_EMB_RES" x="0" y="0">
+			<Parameter Name="ENABLE_RETAIN" Value="" Comment="Enable retain in resource"/>
+			<Parameter Name="OPC_BASE_PATH" Value="" Comment="Path to base OPCUA node"/>
+			<FBNetwork>
+				<EventConnections>
+					<Connection Source="START.COLD" Destination="fmi_tankApp.FROM_FMITB.INIT"/>
+					<Connection Source="START.COLD" Destination="fmi_tankApp.E_CYCLE.START"/>
+				</EventConnections>
+			</FBNetwork>
+		</Resource>
+	</Device>
+	<Segment Name="Ethernet" Type="Ethernet" x="4188.24" y="1017.65" dx1="1764.71">
+		<Attribute Name="Color" Type="STRING" Value="58,148,218"/>
+	</Segment>
+	<Mapping From="fmi_tankApp.FROM_FMITB" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Mapping From="fmi_tankApp.CONV" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Mapping From="fmi_tankApp.GT8" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Mapping From="fmi_tankApp.FB_RS" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Mapping From="fmi_tankApp.E_CYCLE" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Mapping From="fmi_tankApp.LT4" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Mapping From="fmi_tankApp.F_SEL" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Mapping From="fmi_tankApp.TO_FMITB" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Mapping From="fmi_tankApp.LREAL2LREAL" To="FLOGIC_PC.FLOGIC_EMB_RES"/>
+	<Link SegmentName="Ethernet" CommResource="FLOGIC_PC" Comment="">
+	</Link>
+</System>

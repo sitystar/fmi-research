@@ -1,0 +1,54 @@
+# артефакты сборки (перестраиваются scripts/setup.sh)
+build-fmitb/
+
+# тяжёлые зависимости (не хранятся в git: scripts/fetch_boost.sh)
+deps/
+
+# результаты прогонов
+runs/
+
+# FMU: распакованные каталоги — В РЕПОЗИТОРИИ (готовые артефакты, нужны для запуска);
+# при правке .mo пересобрать scripts/build_fmu.sh и закоммитить новый каталог.
+# zip-архивы не храним:
+models/*.fmu
+# сторонние тестовые — не храним:
+models/feedthrough/
+
+# сторонние тестовые FMU (скачиваются: см. README)
+models/Reference-FMUs.zip
+models/feedthrough/
+
+# мусор
+__pycache__/
+*.pyc
+*.o
+
+# рабочие заметки — только локально, в git не выкладывать
+notes-Э*.md
+
+# промежуточные файлы экспорта omc (генерятся при build_fmu.sh)
+models/*.log
+models/*.makefile
+models/*_FMU.libs
+models/*_external_functions.json
+models/*_info.json
+models/index.html
+models/check.mos
+models/mini.mos
+models/install_lib.mos
+
+# сторонние распакованные Reference-FMU
+models/dahlquist/
+
+# черновики отладки (локально)
+app/toy/_experiments/
+
+# сторонний распакованный Reference-FMUs
+models/Reference-FMUs/
+
+# состояние GUI (последние параметры)
+gui_state.json
+
+# артефакты сборки GUI-приложения
+build-gui/
+dist/

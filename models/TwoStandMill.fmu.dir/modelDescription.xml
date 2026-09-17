@@ -1,0 +1,1061 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription
+  fmiVersion="2.0"
+  modelName="TwoStandMill"
+  guid="{c8f37d53-e2aa-4840-b471-fd618266c552}"
+  description=""
+  version=""
+  generationTool="OpenModelica Compiler OpenModelica 1.27.0~5-ga0783c0"
+  generationDateAndTime="2026-09-02T18:40:38Z"
+  variableNamingConvention="structured"
+  numberOfEventIndicators="9">
+  <ModelExchange
+    modelIdentifier="TwoStandMill"
+    needsExecutionTool="false"
+    completedIntegratorStepNotNeeded="false"
+    canBeInstantiatedOnlyOncePerProcess="false"
+    canNotUseMemoryManagementFunctions="false"
+    canGetAndSetFMUstate="false"
+    canSerializeFMUstate="false"
+    providesDirectionalDerivative="false">
+    <SourceFiles>
+      <File name="TwoStandMill.c" />
+      <File name="TwoStandMill_01exo.c" />
+      <File name="TwoStandMill_02nls.c" />
+      <File name="TwoStandMill_03lsy.c" />
+      <File name="TwoStandMill_04set.c" />
+      <File name="TwoStandMill_05evt.c" />
+      <File name="TwoStandMill_06inz.c" />
+      <File name="TwoStandMill_07dly.c" />
+      <File name="TwoStandMill_08bnd.c" />
+      <File name="TwoStandMill_09alg.c" />
+      <File name="TwoStandMill_10asr.c" />
+      <File name="TwoStandMill_11mix.c" />
+      <File name="TwoStandMill_12jac.c" />
+      <File name="TwoStandMill_13opt.c" />
+      <File name="TwoStandMill_14lnz.c" />
+      <File name="TwoStandMill_15syn.c" />
+      <File name="TwoStandMill_16dae.c" />
+      <File name="TwoStandMill_17inl.c" />
+      <File name="TwoStandMill_18spd.c" />
+      <File name="TwoStandMill_FMU.c" />
+      <File name="TwoStandMill_functions.c" />
+      <File name="TwoStandMill_init_fmu.c" />
+      <File name="TwoStandMill_records.c" />
+      <File name="fmi-export/fmu2_model_interface.c" />
+      <File name="fmi-export/fmu_read_flags.c" />
+      <File name="gc/memory_pool.c" />
+      <File name="gc/omc_gc.c" />
+      <File name="math-support/pivot.c" />
+      <File name="meta/meta_modelica_catch.c" />
+      <File name="simulation/arrayIndex.c" />
+      <File name="simulation/eval_dep.c" />
+      <File name="simulation/jacobian_util.c" />
+      <File name="simulation/omc_simulation_util.c" />
+      <File name="simulation/options.c" />
+      <File name="simulation/simulation_info_json.c" />
+      <File name="simulation/simulation_omc_assert.c" />
+      <File name="simulation/solver/delay.c" />
+      <File name="simulation/solver/discrete_changes.c" />
+      <File name="simulation/solver/initialization/initialization.c" />
+      <File name="simulation/solver/model_help.c" />
+      <File name="simulation/solver/nonlinearSolverHomotopy.c" />
+      <File name="simulation/solver/nonlinearSolverHybrd.c" />
+      <File name="simulation/solver/nonlinearSystem.c" />
+      <File name="simulation/solver/nonlinearValuesList.c" />
+      <File name="simulation/solver/omc_math.c" />
+      <File name="simulation/solver/spatialDistribution.c" />
+      <File name="simulation/solver/stateset.c" />
+      <File name="simulation/solver/synchronous.c" />
+      <File name="util/base_array.c" />
+      <File name="util/boolean_array.c" />
+      <File name="util/context.c" />
+      <File name="util/division.c" />
+      <File name="util/doubleEndedList.c" />
+      <File name="util/generic_array.c" />
+      <File name="util/index_spec.c" />
+      <File name="util/integer_array.c" />
+      <File name="util/list.c" />
+      <File name="util/modelica_string.c" />
+      <File name="util/modelica_string_lit.c" />
+      <File name="util/ModelicaUtilities.c" />
+      <File name="util/omc_error.c" />
+      <File name="util/omc_file.c" />
+      <File name="util/omc_init.c" />
+      <File name="util/omc_mmap.c" />
+      <File name="util/omc_msvc.c" />
+      <File name="util/omc_numbers.c" />
+      <File name="util/parallel_helper.c" />
+      <File name="util/rational.c" />
+      <File name="util/real_array.c" />
+      <File name="util/ringbuffer.c" />
+      <File name="util/simulation_options.c" />
+      <File name="util/string_array.c" />
+      <File name="util/utility.c" />
+      <File name="util/varinfo.c" />
+      <File name="external_solvers/dgemm.c" />
+      <File name="external_solvers/dgemv.c" />
+      <File name="external_solvers/dger.c" />
+      <File name="external_solvers/dgesv.c" />
+      <File name="external_solvers/dgetf2.c" />
+      <File name="external_solvers/dgetrf.c" />
+      <File name="external_solvers/dgetri.c" />
+      <File name="external_solvers/dgetrs.c" />
+      <File name="external_solvers/dlamch.c" />
+      <File name="external_solvers/dlaswp.c" />
+      <File name="external_solvers/dscal.c" />
+      <File name="external_solvers/dswap.c" />
+      <File name="external_solvers/dtrmm.c" />
+      <File name="external_solvers/dtrmv.c" />
+      <File name="external_solvers/dtrsm.c" />
+      <File name="external_solvers/dtrti2.c" />
+      <File name="external_solvers/dtrtri.c" />
+      <File name="external_solvers/exit_.c" />
+      <File name="external_solvers/F77_aloc.c" />
+      <File name="external_solvers/i_nint.c" />
+      <File name="external_solvers/idamax.c" />
+      <File name="external_solvers/ieeeck.c" />
+      <File name="external_solvers/ilaenv.c" />
+      <File name="external_solvers/iparmq.c" />
+      <File name="external_solvers/lsame.c" />
+      <File name="external_solvers/pow_di.c" />
+      <File name="external_solvers/s_cat.c" />
+      <File name="external_solvers/s_cmp.c" />
+      <File name="external_solvers/s_copy.c" />
+      <File name="external_solvers/xerbla.c" />
+      <File name="external_solvers/dogleg_.c" />
+      <File name="external_solvers/dpmpar_.c" />
+      <File name="external_solvers/enorm_.c" />
+      <File name="external_solvers/hybrj_.c" />
+      <File name="external_solvers/qform_.c" />
+      <File name="external_solvers/qrfac_.c" />
+      <File name="external_solvers/r1mpyq_.c" />
+      <File name="external_solvers/r1updt_.c" />
+      <File name="ModelicaExternalC/ModelicaIO.c" />
+      <File name="ModelicaExternalC/ModelicaMatIO.c" />
+      <File name="ModelicaExternalC/ModelicaStandardTables.c" />
+      <File name="ModelicaExternalC/ModelicaStandardTablesDummyUsertab.c" />
+      <File name="ModelicaExternalC/snprintf.c" />
+    </SourceFiles>
+  </ModelExchange>
+  <LogCategories>
+    <Category name="logEvents" />
+    <Category name="logSingularLinearSystems" />
+    <Category name="logNonlinearSystems" />
+    <Category name="logDynamicStateSelection" />
+    <Category name="logStatusWarning" />
+    <Category name="logStatusDiscard" />
+    <Category name="logStatusError" />
+    <Category name="logStatusFatal" />
+    <Category name="logStatusPending" />
+    <Category name="logAll" />
+    <Category name="logFmi2Call" />
+  </LogCategories>
+  <DefaultExperiment startTime="0.0" stopTime="120.0" tolerance="1e-6" stepSize="0.02"/>
+  <ModelVariables>
+  <!-- Index of variable = "1" -->
+  <ScalarVariable
+    name="M_dyn_1"
+    valueReference="0"
+    description="момент двигателя 1 (звено 1/T_e), кН·м"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "2" -->
+  <ScalarVariable
+    name="M_dyn_2"
+    valueReference="1"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "3" -->
+  <ScalarVariable
+    name="P_1_f"
+    valueReference="2"
+    description="фильтрованное усилие 1, кН"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "4" -->
+  <ScalarVariable
+    name="P_2_f"
+    valueReference="3"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "5" -->
+  <ScalarVariable
+    name="h_out_1_f"
+    valueReference="4"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "6" -->
+  <ScalarVariable
+    name="h_out_2_f"
+    valueReference="5"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "7" -->
+  <ScalarVariable
+    name="int_sp_1"
+    valueReference="6"
+    description="интегратор ПИ 1, кН·м"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "8" -->
+  <ScalarVariable
+    name="int_sp_2"
+    valueReference="7"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "9" -->
+  <ScalarVariable
+    name="omega_1"
+    valueReference="8"
+    description="угловая скорость валков 1, рад/с"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "10" -->
+  <ScalarVariable
+    name="omega_2"
+    valueReference="9"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "11" -->
+  <ScalarVariable
+    name="sigma_f"
+    valueReference="10"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "12" -->
+  <ScalarVariable
+    name="sigma_int"
+    valueReference="11"
+    description="натяжение-состояние (v1.1), МПа"
+    initial="exact">
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "13" -->
+  <ScalarVariable
+    name="der(M_dyn_1)"
+    valueReference="12"
+    description="der(момент двигателя 1 (звено 1/T_e), кН·м)"
+    >
+    <Real derivative="1"/>
+  </ScalarVariable>
+  <!-- Index of variable = "14" -->
+  <ScalarVariable
+    name="der(M_dyn_2)"
+    valueReference="13"
+    >
+    <Real derivative="2"/>
+  </ScalarVariable>
+  <!-- Index of variable = "15" -->
+  <ScalarVariable
+    name="der(P_1_f)"
+    valueReference="14"
+    description="der(фильтрованное усилие 1, кН)"
+    >
+    <Real derivative="3"/>
+  </ScalarVariable>
+  <!-- Index of variable = "16" -->
+  <ScalarVariable
+    name="der(P_2_f)"
+    valueReference="15"
+    >
+    <Real derivative="4"/>
+  </ScalarVariable>
+  <!-- Index of variable = "17" -->
+  <ScalarVariable
+    name="der(h_out_1_f)"
+    valueReference="16"
+    >
+    <Real derivative="5"/>
+  </ScalarVariable>
+  <!-- Index of variable = "18" -->
+  <ScalarVariable
+    name="der(h_out_2_f)"
+    valueReference="17"
+    >
+    <Real derivative="6"/>
+  </ScalarVariable>
+  <!-- Index of variable = "19" -->
+  <ScalarVariable
+    name="der(int_sp_1)"
+    valueReference="18"
+    description="der(интегратор ПИ 1, кН·м)"
+    >
+    <Real derivative="7"/>
+  </ScalarVariable>
+  <!-- Index of variable = "20" -->
+  <ScalarVariable
+    name="der(int_sp_2)"
+    valueReference="19"
+    >
+    <Real derivative="8"/>
+  </ScalarVariable>
+  <!-- Index of variable = "21" -->
+  <ScalarVariable
+    name="der(omega_1)"
+    valueReference="20"
+    description="der(угловая скорость валков 1, рад/с)"
+    >
+    <Real derivative="9"/>
+  </ScalarVariable>
+  <!-- Index of variable = "22" -->
+  <ScalarVariable
+    name="der(omega_2)"
+    valueReference="21"
+    >
+    <Real derivative="10"/>
+  </ScalarVariable>
+  <!-- Index of variable = "23" -->
+  <ScalarVariable
+    name="der(sigma_f)"
+    valueReference="22"
+    >
+    <Real derivative="11"/>
+  </ScalarVariable>
+  <!-- Index of variable = "24" -->
+  <ScalarVariable
+    name="der(sigma_int)"
+    valueReference="23"
+    description="der(натяжение-состояние (v1.1), МПа)"
+    >
+    <Real derivative="12"/>
+  </ScalarVariable>
+  <!-- Index of variable = "25" -->
+  <ScalarVariable
+    name="Ld_1"
+    valueReference="29"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "26" -->
+  <ScalarVariable
+    name="Ld_2"
+    valueReference="30"
+    description="длина очага деформации, мм"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "27" -->
+  <ScalarVariable
+    name="M_cmd_1"
+    valueReference="31"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "28" -->
+  <ScalarVariable
+    name="M_cmd_2"
+    valueReference="32"
+    description="команды момента до ограничителя, кН·м"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "29" -->
+  <ScalarVariable
+    name="M_load_1"
+    valueReference="33"
+    description="момент нагрузки клети 1, кН·м"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "30" -->
+  <ScalarVariable
+    name="M_load_2"
+    valueReference="34"
+    description="момент нагрузки клети 2, кН·м"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "31" -->
+  <ScalarVariable
+    name="M_motor_1"
+    valueReference="35"
+    description="момент двигателя 1, кН·м"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "32" -->
+  <ScalarVariable
+    name="M_motor_2"
+    valueReference="36"
+    description="момент двигателя 2, кН·м"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "33" -->
+  <ScalarVariable
+    name="P_1"
+    valueReference="37"
+    description="усилие прокатки клети 1 (фильтр), кН"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "34" -->
+  <ScalarVariable
+    name="P_1_raw"
+    valueReference="38"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "35" -->
+  <ScalarVariable
+    name="P_2"
+    valueReference="39"
+    description="усилие прокатки клети 2 (фильтр), кН"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "36" -->
+  <ScalarVariable
+    name="P_2_raw"
+    valueReference="40"
+    description="мгновенные усилия, кН"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "37" -->
+  <ScalarVariable
+    name="Qp_1"
+    valueReference="41"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "38" -->
+  <ScalarVariable
+    name="Qp_2"
+    valueReference="42"
+    description="коэффициент напряжённого состояния"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "39" -->
+  <ScalarVariable
+    name="S0_1"
+    valueReference="43"
+    description="зазор валков клети 1, мм"
+    causality="input"
+    >
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "40" -->
+  <ScalarVariable
+    name="S0_2"
+    valueReference="44"
+    description="зазор валков клети 2, мм"
+    causality="input"
+    >
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "41" -->
+  <ScalarVariable
+    name="T_f_safe"
+    valueReference="45"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "42" -->
+  <ScalarVariable
+    name="T_s_safe"
+    valueReference="46"
+    description="защищённые постоянные"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "43" -->
+  <ScalarVariable
+    name="Ti_1_safe"
+    valueReference="47"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "44" -->
+  <ScalarVariable
+    name="Ti_2_safe"
+    valueReference="48"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "45" -->
+  <ScalarVariable
+    name="a_1"
+    valueReference="49"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "46" -->
+  <ScalarVariable
+    name="a_2"
+    valueReference="50"
+    description="угловые ускорения до ограничителя, рад/с²"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "47" -->
+  <ScalarVariable
+    name="e_1"
+    valueReference="51"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "48" -->
+  <ScalarVariable
+    name="e_2"
+    valueReference="52"
+    description="ошибки скорости, м/с"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "49" -->
+  <ScalarVariable
+    name="eps_1"
+    valueReference="53"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "50" -->
+  <ScalarVariable
+    name="eps_2"
+    valueReference="54"
+    description="обжатия"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "51" -->
+  <ScalarVariable
+    name="h_in"
+    valueReference="55"
+    description="толщина заготовки, мм"
+    causality="input"
+    >
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "52" -->
+  <ScalarVariable
+    name="h_in_s"
+    valueReference="56"
+    description="защищённая толщина заготовки, мм"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "53" -->
+  <ScalarVariable
+    name="h_out_1"
+    valueReference="57"
+    description="толщина после клети 1 (фильтр), мм"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "54" -->
+  <ScalarVariable
+    name="h_out_2"
+    valueReference="58"
+    description="толщина после клети 2 (фильтр), мм"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "55" -->
+  <ScalarVariable
+    name="ho_1"
+    valueReference="59"
+    description="толщина на выходе клети 1 (алгебраически), мм"
+    initial="approx">
+    <Real start="2.3"/>
+  </ScalarVariable>
+  <!-- Index of variable = "56" -->
+  <ScalarVariable
+    name="ho_2"
+    valueReference="60"
+    description="толщина на выходе клети 2 (алгебраически), мм"
+    initial="approx">
+    <Real start="1.5"/>
+  </ScalarVariable>
+  <!-- Index of variable = "57" -->
+  <ScalarVariable
+    name="k_sig"
+    valueReference="61"
+    description="коэффициент натяжения, МПа/с на м/с"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "58" -->
+  <ScalarVariable
+    name="kf_1"
+    valueReference="62"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "59" -->
+  <ScalarVariable
+    name="kf_2"
+    valueReference="63"
+    description="сопротивление деформации, МПа"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "60" -->
+  <ScalarVariable
+    name="sigma_12"
+    valueReference="64"
+    description="натяжение между клетями (фильтр), МПа"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "61" -->
+  <ScalarVariable
+    name="temp"
+    valueReference="65"
+    description="температура металла, °C"
+    causality="input"
+    >
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "62" -->
+  <ScalarVariable
+    name="v_1"
+    valueReference="66"
+    description="скорость клети 1, м/с"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "63" -->
+  <ScalarVariable
+    name="v_2"
+    valueReference="67"
+    description="скорость клети 2, м/с"
+    causality="output"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "64" -->
+  <ScalarVariable
+    name="v_ref_1"
+    valueReference="68"
+    description="задание скорости клети 1, м/с"
+    causality="input"
+    >
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "65" -->
+  <ScalarVariable
+    name="v_ref_2"
+    valueReference="69"
+    description="задание скорости клети 2, м/с"
+    causality="input"
+    >
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "66" -->
+  <ScalarVariable
+    name="width"
+    valueReference="70"
+    description="ширина полосы, мм"
+    causality="input"
+    >
+    <Real start="0.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "67" -->
+  <ScalarVariable
+    name="wmax_1"
+    valueReference="71"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "68" -->
+  <ScalarVariable
+    name="wmax_2"
+    valueReference="72"
+    description="пределы omega, рад/с"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "69" -->
+  <ScalarVariable
+    name="wmin_1"
+    valueReference="73"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "70" -->
+  <ScalarVariable
+    name="wmin_2"
+    valueReference="74"
+    >
+    <Real/>
+  </ScalarVariable>
+  <!-- Index of variable = "71" -->
+  <ScalarVariable
+    name="E_mat"
+    valueReference="75"
+    description="модуль Юнга, МПа"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="2.1e5"/>
+  </ScalarVariable>
+  <!-- Index of variable = "72" -->
+  <ScalarVariable
+    name="I_max_sp"
+    valueReference="76"
+    description="предел интеграторов ПИ, кН·м"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="20.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "73" -->
+  <ScalarVariable
+    name="J_1"
+    valueReference="77"
+    description="момент инерции клети 1, кг·м²"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="4.5"/>
+  </ScalarVariable>
+  <!-- Index of variable = "74" -->
+  <ScalarVariable
+    name="J_2"
+    valueReference="78"
+    description="момент инерции клети 2, кг·м²"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="4.5"/>
+  </ScalarVariable>
+  <!-- Index of variable = "75" -->
+  <ScalarVariable
+    name="K_mill_1"
+    valueReference="79"
+    description="жёсткость станины 1, кН/мм"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="4500.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "76" -->
+  <ScalarVariable
+    name="K_mill_2"
+    valueReference="80"
+    description="жёсткость станины 2, кН/мм"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="4500.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "77" -->
+  <ScalarVariable
+    name="Kp_sp_1"
+    valueReference="81"
+    description="коэффициент П скорости 1"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="8.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "78" -->
+  <ScalarVariable
+    name="Kp_sp_2"
+    valueReference="82"
+    description="коэффициент П скорости 2"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="8.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "79" -->
+  <ScalarVariable
+    name="L_dist"
+    valueReference="83"
+    description="расстояние между клетями, мм"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="2500.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "80" -->
+  <ScalarVariable
+    name="M_max"
+    valueReference="84"
+    description="макс. момент двигателя, кН·м"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="18.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "81" -->
+  <ScalarVariable
+    name="R_1"
+    valueReference="85"
+    description="радиус валков 1, мм"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="125.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "82" -->
+  <ScalarVariable
+    name="R_2"
+    valueReference="86"
+    description="радиус валков 2, мм"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="125.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "83" -->
+  <ScalarVariable
+    name="T_e_1"
+    valueReference="87"
+    description="электрическая постоянная 1, с"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.015"/>
+  </ScalarVariable>
+  <!-- Index of variable = "84" -->
+  <ScalarVariable
+    name="T_e_2"
+    valueReference="88"
+    description="электрическая постоянная 2, с"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.015"/>
+  </ScalarVariable>
+  <!-- Index of variable = "85" -->
+  <ScalarVariable
+    name="T_filt_force"
+    valueReference="89"
+    description="фильтр усилий/толщин, с"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.008"/>
+  </ScalarVariable>
+  <!-- Index of variable = "86" -->
+  <ScalarVariable
+    name="T_filt_sigma"
+    valueReference="90"
+    description="фильтр натяжения, с"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.005"/>
+  </ScalarVariable>
+  <!-- Index of variable = "87" -->
+  <ScalarVariable
+    name="Ti_sp_1"
+    valueReference="91"
+    description="1/Ki контура 1, с (НЕ стандартная Ti: Ti_ст = Kp*Ti_пар)"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.12"/>
+  </ScalarVariable>
+  <!-- Index of variable = "88" -->
+  <ScalarVariable
+    name="Ti_sp_2"
+    valueReference="92"
+    description="1/Ki контура 2, с"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.12"/>
+  </ScalarVariable>
+  <!-- Index of variable = "89" -->
+  <ScalarVariable
+    name="alpha"
+    valueReference="93"
+    description="плечо деформации (доля Ld)"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.48"/>
+  </ScalarVariable>
+  <!-- Index of variable = "90" -->
+  <ScalarVariable
+    name="eps_min"
+    valueReference="94"
+    description="минимальное обжатие"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.001"/>
+  </ScalarVariable>
+  <!-- Index of variable = "91" -->
+  <ScalarVariable
+    name="h_in0"
+    valueReference="95"
+    description="стартовая толщина для фильтров, мм"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="3.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "92" -->
+  <ScalarVariable
+    name="h_min"
+    valueReference="96"
+    description="минимальная толщина, мм"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="0.3"/>
+  </ScalarVariable>
+  <!-- Index of variable = "93" -->
+  <ScalarVariable
+    name="sigma_max"
+    valueReference="97"
+    description="предел натяжения, МПа"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="350.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "94" -->
+  <ScalarVariable
+    name="v_max"
+    valueReference="98"
+    description="предел скорости, м/с"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="15.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "95" -->
+  <ScalarVariable
+    name="v_min"
+    valueReference="99"
+    description="предел скорости, м/с"
+    variability="fixed"
+    causality="parameter"
+    >
+    <Real start="-5.0"/>
+  </ScalarVariable>
+  <!-- Index of variable = "96" -->
+  <ScalarVariable
+    name="diag_motor_sat_1"
+    valueReference="0"
+    description="двигатель 1 в насыщении"
+    variability="discrete"
+    causality="output"
+    >
+    <Boolean/>
+  </ScalarVariable>
+  <!-- Index of variable = "97" -->
+  <ScalarVariable
+    name="diag_motor_sat_2"
+    valueReference="1"
+    description="двигатель 2 в насыщении"
+    variability="discrete"
+    causality="output"
+    >
+    <Boolean/>
+  </ScalarVariable>
+  <!-- Index of variable = "98" -->
+  <ScalarVariable
+    name="diag_tension_low"
+    valueReference="2"
+    description="натяжение &lt;= 0 (провис/сжатие)"
+    variability="discrete"
+    causality="output"
+    >
+    <Boolean/>
+  </ScalarVariable>
+  <!-- Index of variable = "99" -->
+  <ScalarVariable
+    name="diag_tension_max"
+    valueReference="3"
+    description="натяжение на пределе"
+    variability="discrete"
+    causality="output"
+    >
+    <Boolean/>
+  </ScalarVariable>
+  </ModelVariables>
+  <ModelStructure>
+    <Outputs>
+      <Unknown index="29" dependencies="39 51 61 66" dependenciesKind="dependent dependent dependent dependent" />
+      <Unknown index="30" dependencies="39 40 51 61 66" dependenciesKind="dependent dependent dependent dependent dependent" />
+      <Unknown index="31" dependencies="1" dependenciesKind="dependent" />
+      <Unknown index="32" dependencies="2" dependenciesKind="dependent" />
+      <Unknown index="33" dependencies="3" dependenciesKind="dependent" />
+      <Unknown index="35" dependencies="4" dependenciesKind="dependent" />
+      <Unknown index="53" dependencies="5" dependenciesKind="dependent" />
+      <Unknown index="54" dependencies="6" dependenciesKind="dependent" />
+      <Unknown index="60" dependencies="11" dependenciesKind="dependent" />
+      <Unknown index="62" dependencies="9" dependenciesKind="dependent" />
+      <Unknown index="63" dependencies="10" dependenciesKind="dependent" />
+      <Unknown index="96" dependencies="7 9 64" dependenciesKind="dependent dependent dependent" />
+      <Unknown index="97" dependencies="8 10 65" dependenciesKind="dependent dependent dependent" />
+      <Unknown index="98" dependencies="12" dependenciesKind="dependent" />
+      <Unknown index="99" dependencies="12" dependenciesKind="dependent" />
+    </Outputs>
+    <Derivatives>
+      <Unknown index="13" dependencies="1 7 9 64" dependenciesKind="dependent dependent dependent dependent" />
+      <Unknown index="14" dependencies="2 8 10 65" dependenciesKind="dependent dependent dependent dependent" />
+      <Unknown index="15" dependencies="3 39 51 61 66" dependenciesKind="dependent dependent dependent dependent dependent" />
+      <Unknown index="16" dependencies="4 39 40 51 61 66" dependenciesKind="dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="17" dependencies="5 39 51 61 66" dependenciesKind="dependent dependent dependent dependent dependent" />
+      <Unknown index="18" dependencies="6 39 40 51 61 66" dependenciesKind="dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="19" dependencies="7 9 64" dependenciesKind="dependent dependent dependent" />
+      <Unknown index="20" dependencies="8 10 65" dependenciesKind="dependent dependent dependent" />
+      <Unknown index="21" dependencies="1 9 39 51 61 66" dependenciesKind="dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="22" dependencies="2 10 39 40 51 61 66" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="23" dependencies="11 12" dependenciesKind="dependent dependent" />
+      <Unknown index="24" dependencies="9 10 12" dependenciesKind="dependent dependent dependent" />
+    </Derivatives>
+    <InitialUnknowns>
+      <Unknown index="5" dependencies="91" dependenciesKind="dependent" />
+      <Unknown index="6" dependencies="91" dependenciesKind="dependent" />
+      <Unknown index="13" dependencies="1 7 9 64 77 80 81 83" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="14" dependencies="2 8 10 65 78 80 82 84" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="15" dependencies="3 39 51 61 66 75 81 85 90 92" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="16" dependencies="4 39 40 51 61 66 75 76 81 82 85 90 92" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="17" dependencies="39 51 61 66 75 81 85 90 91 92" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="18" dependencies="39 40 51 61 66 75 76 81 82 85 90 91 92" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="19" dependencies="7 9 64 72 81 87" dependenciesKind="dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="20" dependencies="8 10 65 72 82 88" dependenciesKind="dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="21" dependencies="1 9 39 51 61 66 73 75 81 89 90 92 94 95" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="22" dependencies="2 10 39 40 51 61 66 74 75 76 81 82 89 90 92 94 95" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="23" dependencies="11 12 86" dependenciesKind="dependent dependent dependent" />
+      <Unknown index="24" dependencies="9 10 12 71 79 81 82 93" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="29" dependencies="39 51 61 66 75 81 89 90 92" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="30" dependencies="39 40 51 61 66 75 76 81 82 89 90 92" dependenciesKind="dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="31" dependencies="1" dependenciesKind="dependent" />
+      <Unknown index="32" dependencies="2" dependenciesKind="dependent" />
+      <Unknown index="33" dependencies="3" dependenciesKind="dependent" />
+      <Unknown index="35" dependencies="4" dependenciesKind="dependent" />
+      <Unknown index="53" dependencies="91" dependenciesKind="dependent" />
+      <Unknown index="54" dependencies="91" dependenciesKind="dependent" />
+      <Unknown index="60" dependencies="11" dependenciesKind="dependent" />
+      <Unknown index="62" dependencies="9 81" dependenciesKind="dependent dependent" />
+      <Unknown index="63" dependencies="10 82" dependenciesKind="dependent dependent" />
+      <Unknown index="96" dependencies="7 9 64 77 80 81" dependenciesKind="dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="97" dependencies="8 10 65 78 80 82" dependenciesKind="dependent dependent dependent dependent dependent dependent" />
+      <Unknown index="98" dependencies="12" dependenciesKind="dependent" />
+      <Unknown index="99" dependencies="12 93" dependenciesKind="dependent dependent" />
+    </InitialUnknowns>
+  </ModelStructure>
+</fmiModelDescription>

@@ -1,0 +1,6 @@
+{
+  "ide": "flogic-ide",
+  "version": "3.0.0",
+  "minIDE": "3.0.0",
+  "project": "fmi_tank"
+}

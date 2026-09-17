@@ -1,0 +1,54 @@
+EXPORTS
+  ;***************************************************
+  ;Common Functions
+  ;****************************************************
+  TwoStandMill_fmiGetTypesPlatform @1
+  TwoStandMill_fmiGetVersion @2
+  TwoStandMill_fmiSetDebugLogging @3
+  TwoStandMill_fmiInstantiate @4
+  TwoStandMill_fmiFreeInstance @5
+  TwoStandMill_fmiSetupExperiment @6
+  TwoStandMill_fmiEnterInitializationMode @7
+  TwoStandMill_fmiExitInitializationMode @8
+  TwoStandMill_fmiTerminate @9
+  TwoStandMill_fmiReset @10
+  TwoStandMill_fmiGetReal @11
+  TwoStandMill_fmiGetInteger @12
+  TwoStandMill_fmiGetBoolean @13
+  TwoStandMill_fmiGetString @14
+  TwoStandMill_fmiSetReal @15
+  TwoStandMill_fmiSetInteger @16
+  TwoStandMill_fmiSetBoolean @17
+  TwoStandMill_fmiSetString @18
+  TwoStandMill_fmiGetFMUstate @19
+  TwoStandMill_fmiSetFMUstate @20
+  TwoStandMill_fmiFreeFMUstate @21
+  TwoStandMill_fmiSerializedFMUstateSize @22
+  TwoStandMill_fmiSerializeFMUstate @23
+  TwoStandMill_fmiDeSerializeFMUstate @24
+  TwoStandMill_fmiGetDirectionalDerivative @25
+  ;***************************************************
+  ;Functions for FMI for Model Exchange
+  ;****************************************************
+  TwoStandMill_fmiEnterEventMode @26
+  TwoStandMill_fmiNewDiscreteStates @27
+  TwoStandMill_fmiEnterContinuousTimeMode @28
+  TwoStandMill_fmiCompletedIntegratorStep @29
+  TwoStandMill_fmiSetTime @30
+  TwoStandMill_fmiSetContinuousStates @31
+  TwoStandMill_fmiGetDerivatives @32
+  TwoStandMill_fmiGetEventIndicators @33
+  TwoStandMill_fmiGetContinuousStates @34
+  TwoStandMill_fmiGetNominalsOfContinuousStates @35
+  ;***************************************************
+  ;Functions for FMI for Co-Simulation
+  ;****************************************************
+  TwoStandMill_fmiSetRealInputDerivatives @36
+  TwoStandMill_fmiGetRealOutputDerivatives @37
+  TwoStandMill_fmiDoStep @38
+  TwoStandMill_fmiCancelStep @39
+  TwoStandMill_fmiGetStatus @40
+  TwoStandMill_fmiGetRealStatus @41
+  TwoStandMill_fmiGetIntegerStatus @42
+  TwoStandMill_fmiGetBooleanStatus @43
+  TwoStandMill_fmiGetStringStatus @44

@@ -1,0 +1,54 @@
+EXPORTS
+  ;***************************************************
+  ;Common Functions
+  ;****************************************************
+  Tank_fmiGetTypesPlatform @1
+  Tank_fmiGetVersion @2
+  Tank_fmiSetDebugLogging @3
+  Tank_fmiInstantiate @4
+  Tank_fmiFreeInstance @5
+  Tank_fmiSetupExperiment @6
+  Tank_fmiEnterInitializationMode @7
+  Tank_fmiExitInitializationMode @8
+  Tank_fmiTerminate @9
+  Tank_fmiReset @10
+  Tank_fmiGetReal @11
+  Tank_fmiGetInteger @12
+  Tank_fmiGetBoolean @13
+  Tank_fmiGetString @14
+  Tank_fmiSetReal @15
+  Tank_fmiSetInteger @16
+  Tank_fmiSetBoolean @17
+  Tank_fmiSetString @18
+  Tank_fmiGetFMUstate @19
+  Tank_fmiSetFMUstate @20
+  Tank_fmiFreeFMUstate @21
+  Tank_fmiSerializedFMUstateSize @22
+  Tank_fmiSerializeFMUstate @23
+  Tank_fmiDeSerializeFMUstate @24
+  Tank_fmiGetDirectionalDerivative @25
+  ;***************************************************
+  ;Functions for FMI for Model Exchange
+  ;****************************************************
+  Tank_fmiEnterEventMode @26
+  Tank_fmiNewDiscreteStates @27
+  Tank_fmiEnterContinuousTimeMode @28
+  Tank_fmiCompletedIntegratorStep @29
+  Tank_fmiSetTime @30
+  Tank_fmiSetContinuousStates @31
+  Tank_fmiGetDerivatives @32
+  Tank_fmiGetEventIndicators @33
+  Tank_fmiGetContinuousStates @34
+  Tank_fmiGetNominalsOfContinuousStates @35
+  ;***************************************************
+  ;Functions for FMI for Co-Simulation
+  ;****************************************************
+  Tank_fmiSetRealInputDerivatives @36
+  Tank_fmiGetRealOutputDerivatives @37
+  Tank_fmiDoStep @38
+  Tank_fmiCancelStep @39
+  Tank_fmiGetStatus @40
+  Tank_fmiGetRealStatus @41
+  Tank_fmiGetIntegerStatus @42
+  Tank_fmiGetBooleanStatus @43
+  Tank_fmiGetStringStatus @44
