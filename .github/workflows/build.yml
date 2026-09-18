@@ -12,7 +12,7 @@ name: build
 
 on:
   push:
-    branches: [main]
+    branches: [main, "gui/**"]
   workflow_dispatch:
 
 jobs:
