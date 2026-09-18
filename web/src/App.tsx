@@ -134,12 +134,12 @@ export default function App() {
                 { title: 'вх/вых', name: 'io', width: 100 },
               ]}
             />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 8, maxHeight: 180, overflowY: 'auto' }}>
               {models.map(m => (
-                <Button key={m.name} size="s"
+                <Button key={m.name} size="xs"
                         styleType={sel?.name === m.name ? 'primary' : 'secondary'}
                         onClick={() => setSel(m)}>
-                  {m.name} ({m.inputs.length}вх/{m.outputs.length}вых)
+                  {m.name} ({m.inputs.length}/{m.outputs.length})
                 </Button>
               ))}
             </div>
@@ -150,7 +150,7 @@ export default function App() {
             <div style={panel()}><b>{sel ? `Модель: ${sel.name}` : 'Модель не выбрана'}</b>
               {sel && (
                 <div style={{ display: 'flex', gap: 24 }}>
-                  <div style={{ flex: 1, maxHeight: 260, overflowY: 'auto' }}>
+                  <div style={{ flex: 1, maxHeight: 260, overflowY: 'auto', paddingRight: 10 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Входы (Flogic → модель), {sel.inputs.length}</div>
                     {sel.inputs.map((v, i) => (
                       <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0', fontSize: 13, borderBottom: '1px solid var(--theme-background-secondary, #eee)' }}>
@@ -160,7 +160,7 @@ export default function App() {
                       </div>
                     ))}
                   </div>
-                  <div style={{ flex: 1, maxHeight: 260, overflowY: 'auto' }}>
+                  <div style={{ flex: 1, maxHeight: 260, overflowY: 'auto', paddingRight: 10 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Выходы (модель → Flogic), {sel.outputs.length}</div>
                     {sel.outputs.map((v, i) => (
                       <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0', fontSize: 13, borderBottom: '1px solid var(--theme-background-secondary, #eee)' }}>
@@ -185,7 +185,9 @@ export default function App() {
                 <label>Длительность, с (0 = до «Стоп»)<br />
                   <InputNumber value={params.duration} min={0}
                                onChange={v => setParams(p => ({ ...p, duration: Number(v) }))} /></label>
-                <label>lookAheadTime, с<br />
+                <label title="Если значения модели не меняются дольше этого времени, FMITerminalBlock принудительно отправляет текущие данные контроллеру. Меньше значение = чаще обновления. По умолчанию: 1 с."
+                       style={{ cursor: 'help' }}>
+                  Макс. пауза данных, с ⓘ<br />
                   <InputNumber value={params.lookahead} min={0.1} step={0.5}
                                onChange={v => setParams(p => ({ ...p, lookahead: Number(v) }))} /></label>
                 <label>Лог<br />

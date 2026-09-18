@@ -228,8 +228,9 @@ def _seed_models():
     """При первом запуске — скопировать образцы FMU из /opt в рабочий каталог."""
     opt_models = "/opt/fmi-coupling/models"
     user_models = os.path.join(core.MODELS_DIR)
-    if not os.path.isdir(opt_models) or not os.path.isdir(user_models):
+    if not os.path.isdir(opt_models):
         return
+    os.makedirs(user_models, exist_ok=True)
     import shutil
     for d in os.listdir(opt_models):
         if d.endswith(".fmu.dir"):
