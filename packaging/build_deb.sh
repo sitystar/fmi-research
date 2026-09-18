@@ -45,11 +45,11 @@ install -D -m 755 "build-gui/dist/fmi-coupling-server"       "$PKG/opt/fmi-coupl
 install -D -m 755 packaging/launcher.sh                       "$PKG/opt/fmi-coupling/fmi-coupling"
 install -D -m 755 packaging/fmi-window.py                      "$PKG/opt/fmi-coupling/fmi-window.py"
 
-# FMU-модели (образцы из репозитория)
+# FMU-модели (образцы из репозитория) — каталог создать ДО копирования!
+mkdir -p "$PKG/opt/fmi-coupling/models"
 for d in "$ROOT"/models/*.fmu.dir; do
   [ -d "$d" ] && cp -r "$d" "$PKG/opt/fmi-coupling/models/"
 done
-mkdir -p "$PKG/opt/fmi-coupling/models"
 mkdir -p "$PKG/opt/fmi-coupling/ui"
 cp -r "$WEB_SRC"/.                                         "$PKG/opt/fmi-coupling/ui/"
 

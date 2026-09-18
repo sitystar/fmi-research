@@ -27,8 +27,8 @@ def _apply_root(root):
     """Переназначить пути. Связыватель: сборка репозитория (режим разработки)
     или бандл из deb-пакета /opt/fmi-coupling/fmitb."""
     global ROOT, MODELS_DIR, RUNS_DIR, FMITB, BOOST_LIBS, STATE_FILE
-    ROOT = root
-    os.makedirs(os.path.join(root, "models"), exist_ok=True)
+    ROOT = os.path.normpath(root)
+    os.makedirs(os.path.join(ROOT, "models"), exist_ok=True)
     os.makedirs(os.path.join(root, "runs"), exist_ok=True)
     MODELS_DIR = os.path.join(ROOT, "models")
     RUNS_DIR = os.path.join(ROOT, "runs")
