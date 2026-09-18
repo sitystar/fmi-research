@@ -79,8 +79,8 @@ def _watchdog(proc, seconds):
 def api_models():
     return [{"name": m.name,
              "dir": os.path.relpath(m.dir, core.ROOT),
-             "inputs": [{"name": n, "type": t} for n, t in m.inputs],
-             "outputs": [{"name": n, "type": t} for n, t in m.outputs]}
+             "inputs": [{"name": n, "type": t, "desc": d} for n, t, d in m.inputs],
+             "outputs": [{"name": n, "type": t, "desc": d} for n, t, d in m.outputs]}
             for m in core.scan_models()]
 
 
@@ -109,6 +109,21 @@ def api_status():
 
 
 _params_cache = {"out_port": 1499, "in_port": 1500}
+
+
+@app.get("/api/fs")
+def api_fs(path: str = "/"):
+    """Листинг директорий для навигации (диалог выбора каталога)."""
+    path = os.path.normpath(os.path.abspath(path))
+    if not os.path.isdir(path):
+        return JSONResponse(status_code=400, content={"error": f"не каталог: {path}"})
+    try:
+        dirs = sorted(d for d in os.listdir(path)
+                      if os.path.isdir(os.path.join(path, d)) and not d.startswith("."))
+    except PermissionError:
+        dirs = []
+    parent = os.path.dirname(path) if path != "/" else None
+    return {"path": path, "dirs": dirs, "parent": parent}
 
 
 @app.post("/api/root")

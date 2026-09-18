@@ -14,6 +14,36 @@ const panel = (extra?: React.CSSProperties): React.CSSProperties => ({
 })
 import { api, subscribeLogs, ModelInfo, Status, Trace } from './api'
 
+function BrowseDir({ onPick }: { onPick: (path: string) => void }) {
+  const [path, setPath] = useState('/home')
+  const [data, setData] = useState<{ path: string; dirs: string[]; parent: string | null } | null>(null)
+  useEffect(() => {
+    api.fs(path).then(setData).catch(e => console.error(e))
+  }, [path])
+  if (!data) return <div>…</div>
+  return (
+    <div>
+      <div style={{ fontWeight: 600, marginBottom: 8, wordBreak: 'break-all' }}>{data.path}</div>
+      {data.parent && (
+        <Button size="s" styleType="secondary" onClick={() => setPath(data.parent!)}
+                style={{ marginBottom: 8 }}>← вверх</Button>
+      )}
+      <Button size="s" styleType="primary" onClick={() => onPick(data.path)}
+              style={{ marginBottom: 8, marginLeft: 8 }}>Выбрать этот каталог</Button>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {data.dirs.map(d => (
+          <Button key={d} size="s" styleType="link"
+                  onClick={() => setPath(data.path + '/' + d)}
+                  style={{ textAlign: 'left', justifyContent: 'flex-start' }}>
+            📁 {d}
+          </Button>
+        ))}
+        {data.dirs.length === 0 && <div style={{ opacity: 0.5, padding: 8 }}>поддиректорий нет</div>}
+      </div>
+    </div>
+  )
+}
+
 const TYPE_NAME: Record<string, string> = { '0': 'Real', '1': 'Int', '2': 'Bool', '3': 'Str' }
 
 export default function App() {
@@ -25,6 +55,7 @@ export default function App() {
   const [logs, setLogs] = useState<string[]>([])
   const [drawer, setDrawer] = useState(false)
   const [trace, setTrace] = useState<Trace | null>(null)
+  const [browse, setBrowse] = useState(false)
   const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(null)
   const logRef = useRef<HTMLPreElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -110,11 +141,7 @@ export default function App() {
           <Button styleType="secondary" onClick={() => fileRef.current?.click()}>Импорт FMU…</Button>
           <input ref={fileRef} type="file" accept=".fmu" style={{ display: 'none' }}
                  onChange={e => { doImport(e.target.files?.[0]); e.target.value = '' }} />
-          <Button styleType="secondary" onClick={() => {
-            const p = window.prompt('Рабочий каталог (модели, trace):', status?.root || '')
-            if (p) api.setRoot(p).then(() => { refreshModels().catch(() => {}); api.status().then(setStatus).catch(() => {}) })
-                      .catch(e => setNotice({ text: String(e.message || e), bad: true }))
-          }}>Сменить каталог…</Button>
+          <Button styleType="secondary" onClick={() => setBrowse(true)}>Сменить каталог…</Button>
           <Button styleType="secondary" onClick={() => refreshModels().catch(() => {})}>Обновить</Button>
         </div>
 
@@ -154,9 +181,10 @@ export default function App() {
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Входы (Flogic → модель), {sel.inputs.length}</div>
                     {sel.inputs.map((v, i) => (
                       <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0', fontSize: 13, borderBottom: '1px solid var(--theme-background-secondary, #eee)' }}>
-                        <span style={{ opacity: 0.6, width: 48 }}>SD_{i + 1}</span>
-                        <span style={{ flex: 1 }}>{v.name}</span>
-                        <span style={{ opacity: 0.6 }}>{TYPE_NAME[v.type] || v.type}</span>
+                        <span style={{ opacity: 0.6, width: 42 }}>SD_{i + 1}</span>
+                        <span style={{ width: 110, overflow: 'hidden', textOverflow: 'ellipsis' }}>{v.name}</span>
+                        <span style={{ opacity: 0.6, width: 34 }}>{TYPE_NAME[v.type] || v.type}</span>
+                        <span style={{ flex: 1, opacity: 0.7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.desc}>{v.desc || '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -164,9 +192,10 @@ export default function App() {
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Выходы (модель → Flogic), {sel.outputs.length}</div>
                     {sel.outputs.map((v, i) => (
                       <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0', fontSize: 13, borderBottom: '1px solid var(--theme-background-secondary, #eee)' }}>
-                        <span style={{ opacity: 0.6, width: 48 }}>RD_{i + 1}</span>
-                        <span style={{ flex: 1 }}>{v.name}</span>
-                        <span style={{ opacity: 0.6 }}>{TYPE_NAME[v.type] || v.type}</span>
+                        <span style={{ opacity: 0.6, width: 42 }}>RD_{i + 1}</span>
+                        <span style={{ width: 110, overflow: 'hidden', textOverflow: 'ellipsis' }}>{v.name}</span>
+                        <span style={{ opacity: 0.6, width: 34 }}>{TYPE_NAME[v.type] || v.type}</span>
+                        <span style={{ flex: 1, opacity: 0.7, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.desc}>{v.desc || '—'}</span>
                       </div>
                     ))}
                   </div>
@@ -223,6 +252,19 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      <Drawer open={browse} onClose={() => setBrowse(false)} title="Выбор рабочего каталога" width={480} placement="right">
+        <BrowseDir onPick={async p => {
+          try {
+            await api.setRoot(p)
+            await refreshModels()
+            api.status().then(setStatus).catch(() => {})
+            setBrowse(false)
+          } catch (e) {
+            setNotice({ text: String(e instanceof Error ? e.message : e), bad: true })
+          }
+        }} />
+      </Drawer>
 
       <Drawer open={drawer} onClose={() => setDrawer(false)} title="График trace" width={980}
               placement="right">

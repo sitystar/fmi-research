@@ -89,7 +89,7 @@ class ModelEntry:
             typ = next((TYPES[ch.tag] for ch in v if ch.tag in TYPES), None)
             if typ is None or v.get("name") == "time":
                 continue
-            entry = (v.get("name"), typ)
+            entry = (v.get("name"), typ, v.get("description") or "")
             if v.get("causality") == "input":
                 self.inputs.append(entry)
             elif v.get("causality") == "output":
@@ -191,7 +191,7 @@ def save_state(st):
 def selftest(argv):
     if argv[0] == "--scan":
         for m in scan_models():
-            print(f"{m.name:20s} входы={[v for v, _ in m.inputs]} выходы={[v for v, _ in m.outputs]}")
+            print(f"{m.name:20s} входы={[v for v, _, _ in m.inputs]} выходы={[v for v, _, _ in m.outputs]}")
         return 0
     if argv[0] == "--plot-test":
         names, times, cols = parse_trace(argv[1])
@@ -220,7 +220,7 @@ def selftest(argv):
 def selftest(argv):
     if argv[0] == "--scan":
         for m in scan_models():
-            print(f"{m.name:20s} входы={[v for v, _ in m.inputs]} выходы={[v for v, _ in m.outputs]}")
+            print(f"{m.name:20s} входы={[v for v, _, _ in m.inputs]} выходы={[v for v, _, _ in m.outputs]}")
         return 0
     if argv[0] == "--plot-test":
         names, times, cols = parse_trace(argv[1])

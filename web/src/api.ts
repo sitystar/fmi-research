@@ -1,7 +1,7 @@
 // Автор: Evgenii I, 2026
 // Типы и обмен с локальным сервером (scripts/fmi_server.py)
 
-export interface Var { name: string; type: string }
+export interface Var { name: string; type: string; desc: string }
 export interface ModelInfo {
   name: string
   dir: string
@@ -36,6 +36,7 @@ export const api = {
     j('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) }),
   stop: () => j('/api/stop', { method: 'POST' }),
   trace: () => j('/api/trace') as Promise<Trace>,
+  fs: (path: string) => j(`/api/fs?path=${encodeURIComponent(path)}`) as Promise<{ path: string; dirs: string[]; parent: string | null }>,
   setRoot: (path: string) =>
     j('/api/root', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path }) }),
   importFmu: async (file: File) => {
