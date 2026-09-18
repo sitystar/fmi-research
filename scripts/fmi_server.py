@@ -230,9 +230,6 @@ def _seed_models():
     user_models = os.path.join(core.MODELS_DIR)
     if not os.path.isdir(opt_models) or not os.path.isdir(user_models):
         return
-    existing = [f for f in os.listdir(user_models) if f.endswith(".fmu.dir")]
-    if existing:
-        return  # уже есть модели — не трогаем
     import shutil
     for d in os.listdir(opt_models):
         if d.endswith(".fmu.dir"):

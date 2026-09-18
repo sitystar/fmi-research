@@ -8,7 +8,8 @@ import {
 } from 'svs-react-ui'
 
 const panel = (extra?: React.CSSProperties): React.CSSProperties => ({
-  border: '1px solid var(--background-secondary, rgba(128,128,128,.35))',
+  border: '1px solid var(--theme-background-secondary, rgba(128,128,128,.35))',
+  background: 'var(--theme-background-secondary, transparent)',
   borderRadius: 8, padding: 12, minWidth: 0, ...extra,
 })
 import { api, subscribeLogs, ModelInfo, Status, Trace } from './api'
@@ -93,8 +94,8 @@ export default function App() {
       <div style={{
         display: 'flex', flexDirection: 'column', height: '100vh',
         gap: 8, padding: 12, boxSizing: 'border-box',
-        background: 'var(--background, inherit)',
-        color: 'var(--text-primary, inherit)',
+        background: dark ? 'var(--theme-background-primary, #141925)' : 'var(--theme-background-tertiary, #dbe1e8)',
+        color: dark ? '#e8ecf1' : '#1a1a2e',
         transition: 'background 0.2s, color 0.2s',
       }}>
         {/* шапка */}
@@ -149,19 +150,25 @@ export default function App() {
             <div style={panel()}><b>{sel ? `Модель: ${sel.name}` : 'Модель не выбрана'}</b>
               {sel && (
                 <div style={{ display: 'flex', gap: 24 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Входы (Flogic → модель)</div>
-                    <Table
-                      data={sel.inputs.map((v, i) => ({ port: `SD_${i + 1}`, name: v.name, type: TYPE_NAME[v.type] || v.type }))}
-                      cols={[{ title: 'порт', name: 'port', width: 70 }, { title: 'переменная', name: 'name' }, { title: 'тип', name: 'type', width: 60 }]}
-                    />
+                  <div style={{ flex: 1, maxHeight: 260, overflowY: 'auto' }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Входы (Flogic → модель), {sel.inputs.length}</div>
+                    {sel.inputs.map((v, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0', fontSize: 13, borderBottom: '1px solid var(--theme-background-secondary, #eee)' }}>
+                        <span style={{ opacity: 0.6, width: 48 }}>SD_{i + 1}</span>
+                        <span style={{ flex: 1 }}>{v.name}</span>
+                        <span style={{ opacity: 0.6 }}>{TYPE_NAME[v.type] || v.type}</span>
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Выходы (модель → Flogic)</div>
-                    <Table
-                      data={sel.outputs.map((v, i) => ({ port: `RD_${i + 1}`, name: v.name, type: TYPE_NAME[v.type] || v.type }))}
-                      cols={[{ title: 'порт', name: 'port', width: 70 }, { title: 'переменная', name: 'name' }, { title: 'тип', name: 'type', width: 60 }]}
-                    />
+                  <div style={{ flex: 1, maxHeight: 260, overflowY: 'auto' }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Выходы (модель → Flogic), {sel.outputs.length}</div>
+                    {sel.outputs.map((v, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 8, padding: '2px 0', fontSize: 13, borderBottom: '1px solid var(--theme-background-secondary, #eee)' }}>
+                        <span style={{ opacity: 0.6, width: 48 }}>RD_{i + 1}</span>
+                        <span style={{ flex: 1 }}>{v.name}</span>
+                        <span style={{ opacity: 0.6 }}>{TYPE_NAME[v.type] || v.type}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -201,7 +208,13 @@ export default function App() {
             {/* лог */}
             <div style={panel({ flex: 1, minHeight: 120, overflow: 'hidden', display: 'flex', flexDirection: 'column' })}><b>Журнал{status?.model ? ` — ${status.model}` : ''}</b>
               <pre ref={logRef}
-                   style={{ margin: 0, flex: 1, overflow: 'auto', fontSize: 12, lineHeight: 1.45, fontFamily: 'ui-monospace, Menlo, Consolas, monospace', whiteSpace: 'pre-wrap' }}>
+                   style={{
+                     margin: 0, flex: 1, overflow: 'auto', fontSize: 12, lineHeight: 1.45,
+                     fontFamily: 'ui-monospace, Menlo, Consolas, monospace', whiteSpace: 'pre-wrap',
+                     background: dark ? '#0d1117' : '#f6f8fa',
+                     color: dark ? '#c9d1d9' : '#24292f',
+                     padding: 8, borderRadius: 6,
+                   }}>
                 {logs.join('') || '— пусто —'}
               </pre>
             </div>
