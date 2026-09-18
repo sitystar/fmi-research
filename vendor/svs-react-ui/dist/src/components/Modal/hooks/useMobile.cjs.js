@@ -1,0 +1,1 @@
+"use client";"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var e=require("react");exports.default=function(){var n=e.useState(window.innerWidth<=768),t=n[0],r=n[1];return e.useEffect((function(){var e=function(){r(window.innerWidth<=768)};return window.addEventListener("resize",e),function(){window.removeEventListener("resize",e)}}),[]),t};

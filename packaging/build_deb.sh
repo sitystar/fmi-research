@@ -15,25 +15,36 @@
 set -eu
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PY=${FMI_GUI_PY:-/usr/bin/python3}
-VER=1.1.3
+VER=2.0.0
 APP=fmi-coupling-gui
 
 command -v "$PY" >/dev/null || { echo "нет /usr/bin/python3" >&2; exit 2; }
-"$PY" -c "import tkinter" 2>/dev/null || {
-  echo "НЕТ tkinter: sudo apt install -y python3-tk" >&2; exit 2; }
 "$PY" -m PyInstaller --version >/dev/null 2>&1 || {
   echo "ставлю pyinstaller (--user)..."; "$PY" -m pip install ${FMI_GUI_PIP_OPTS:---user} pyinstaller; }
 
-echo "== 1/3 PyInstaller: самодостаточный бинарник (python внутри) =="
+echo "== 1/3 PyInstaller: сервер (python внутри) =="
 cd "$ROOT"
-"$PY" -m PyInstaller --onefile --windowed --name "$APP" \
+"$PY" -m pip install ${FMI_GUI_PIP_OPTS:---user} -q fastapi "uvicorn[standard]" python-multipart 2>/dev/null || true
+"$PY" -m PyInstaller --onefile --name fmi-coupling-server \
   --distpath build-gui/dist --workpath build-gui/work --specpath build-gui \
-  scripts/fmi_gui.py
+  scripts/fmi_server.py
+
+# фронтенд: готовая сборка (CI) или локальная
+WEB_SRC="${FMI_WEB_DIR:-$ROOT/web/dist}"
+if [ ! -f "$WEB_SRC/index.html" ] && command -v npm >/dev/null; then
+  echo "  веб-интерфейс не собран — собираю локально (npm)"
+  (cd "$ROOT/web" && npm install --no-audit --no-fund && npm run build)
+  WEB_SRC="$ROOT/web/dist"
+fi
+[ -f "$WEB_SRC/index.html" ] || { echo "ОШИБКА: веб-интерфейс не собран ($WEB_SRC)" >&2; exit 1; }
 
 echo "== 2/3 раскладка пакета =="
 PKG="build-gui/pkg/$APP"
 rm -rf build-gui/pkg
-install -D -m 755 "build-gui/dist/$APP"                       "$PKG/opt/fmi-coupling/$APP"
+install -D -m 755 "build-gui/dist/fmi-coupling-server"       "$PKG/opt/fmi-coupling/fmi-coupling-server"
+install -D -m 755 packaging/launcher.sh                       "$PKG/opt/fmi-coupling/fmi-coupling"
+mkdir -p "$PKG/opt/fmi-coupling/ui"
+cp -r "$WEB_SRC"/.                                         "$PKG/opt/fmi-coupling/ui/"
 
 # связыватель: из сборки репозитория или готового бандла (CI-артефакт fmitb)
 FMITB_SRC="${FMI_FMITB_DIR:-$ROOT/build-fmitb}"
@@ -55,13 +66,13 @@ Package: $APP
 Version: $VER
 Architecture: amd64
 Maintainer: Evgenii I <EvgeniiI@localhost>
-Depends:
+Depends: libwebkit2gtk-4.1-0
 Section: science
 Priority: optional
-Description: GUI for coupling Flogic (IEC 61499, forte) with FMU models
- Self-sufficient: FMITerminalBlock coupler with libraries is included.
- Import FMU, pick model, set ports/duration, live log, trace plot.
- Python and Tk are bundled inside the binary. Data goes to ~/fmi-coupling.
+Description: Web GUI for coupling Flogic (IEC 61499, forte) with FMU models
+ Severstal-style UI (svs-react-ui, ick theme) served from localhost.
+ Self-sufficient: FMITerminalBlock coupler with libraries and python
+ backend are bundled. Launcher opens the browser. Data: ~/fmi-coupling.
 EOF
 
 echo "== 3/3 dpkg-deb =="

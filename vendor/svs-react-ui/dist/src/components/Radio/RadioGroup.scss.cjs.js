@@ -1,0 +1,1 @@
+"use client";"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var e=".svs-radio-group{display:inline-flex;flex-direction:column;gap:10px}.svs-radio-group--button{display:flex;flex-direction:row;gap:0}.svs-radio-group--inline{flex-direction:row;gap:15px}";require("style-inject")(e),exports.default=e;

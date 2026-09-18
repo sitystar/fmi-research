@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("tslib"),r=require("react/jsx-runtime"),i=require("./ThemeProvider.cjs.js"),s=require("../../themes/default.cjs.js");exports.DefaultThemeProvider=function(t){var u=t.children,c=e.__rest(t,["children"]);return r.jsx(i.ThemeProvider,e.__assign({theme:s.DEFAULT_THEME},c,{children:u}))};

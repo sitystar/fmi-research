@@ -1,0 +1,1 @@
+"use client";import{__assign as n}from"tslib";var e=function(t,l,r){return t.reduce((function(t,i){var c=i.id,d=i._children,o=r?i[r]:null,u=n(n({id:c},l[c]),{legendField:o,childrenLength:d&&d.length});return t=t.concat(u),(null==d?void 0:d.length)&&l[c].opened&&(t=t.concat(d&&e(d,l,r))),t}),[])};export{e as createTableRowsMap};

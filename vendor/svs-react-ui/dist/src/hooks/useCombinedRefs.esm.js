@@ -1,0 +1,1 @@
+"use client";import{useRef as r,useEffect as n}from"react";var t=function(){for(var t=[],e=0;e<arguments.length;e++)t[e]=arguments[e];var u=r(null);return n((function(){t.forEach((function(r){r&&("function"==typeof r?r(u.current):r.current=u.current)}))}),[t]),u};export{t as default};

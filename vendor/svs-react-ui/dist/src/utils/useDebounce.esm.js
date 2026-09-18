@@ -1,0 +1,1 @@
+"use client";import{useRef as r,useCallback as t}from"react";function e(e,n){var o=r(void 0);return t((function(){for(var r=[],t=0;t<arguments.length;t++)r[t]=arguments[t];clearTimeout(o.current),o.current=setTimeout((function(){return e.apply(void 0,r)}),n)}),[e,n])}export{e as useDebounce};

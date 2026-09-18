@@ -1,0 +1,37 @@
+import { ReactNode, CSSProperties } from 'react';
+import './Popup.scss';
+import { PopoverPlacementType, PopoverProps } from '../Popover';
+export type PopupProps = {
+    visible?: boolean;
+    children: ReactNode;
+    content: ReactNode;
+    disabled?: boolean;
+    trigger?: 'hover' | 'click';
+    onVisibleChange?: (value: boolean) => void;
+    placement?: PopoverPlacementType;
+    className?: string;
+    popupClassName?: string;
+    autoPosition?: boolean;
+    corner?: boolean;
+    popupStyle?: CSSProperties;
+    appendToBody?: boolean;
+    triggerStyle?: CSSProperties;
+    closeOnClickOutside?: boolean;
+} & Pick<PopoverProps, 'mouseLeaveDelay'>;
+export declare const Popup: import("react").ForwardRefExoticComponent<{
+    visible?: boolean;
+    children: ReactNode;
+    content: ReactNode;
+    disabled?: boolean;
+    trigger?: "hover" | "click";
+    onVisibleChange?: (value: boolean) => void;
+    placement?: PopoverPlacementType;
+    className?: string;
+    popupClassName?: string;
+    autoPosition?: boolean;
+    corner?: boolean;
+    popupStyle?: CSSProperties;
+    appendToBody?: boolean;
+    triggerStyle?: CSSProperties;
+    closeOnClickOutside?: boolean;
+} & Pick<PopoverProps, "mouseLeaveDelay"> & import("react").RefAttributes<unknown>>;

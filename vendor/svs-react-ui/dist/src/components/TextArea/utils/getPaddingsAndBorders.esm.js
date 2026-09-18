@@ -1,0 +1,1 @@
+"use client";var t=function(t,r){var e=getComputedStyle(t);return{vertical:["padding-top","padding-bottom","border-top-width","border-bottom-width"],horizontal:["padding-left","padding-right","border-left-width","border-right-width"]}[r].reduce((function(t,r){return t+parseInt(e.getPropertyValue(r))}),0)};export{t as getPaddingsAndBorders};

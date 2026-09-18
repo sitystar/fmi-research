@@ -1,0 +1,1 @@
+"use client";"use strict";var d=new Set;exports.addBodyBlock=function(e){d.has(e)||(d.add(e),document.body.classList.add("svs-body-hidden"))},exports.removeBodyBlock=function(e){d.has(e)&&(d.delete(e),0===d.size&&document.body.classList.remove("svs-body-hidden"))};

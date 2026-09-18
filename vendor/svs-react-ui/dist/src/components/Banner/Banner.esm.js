@@ -1,0 +1,1 @@
+"use client";import{__assign as e}from"tslib";import{jsx as r}from"react/jsx-runtime";import{InlineMessage as t}from"../InlineMessage/InlineMessage.esm.js";var i=function(i){return r(t,e({},i))};export{i as Banner};

@@ -1,0 +1,1 @@
+"use client";import{__assign as r}from"tslib";var t=function(t){return Object.keys(t).reduce((function(e,n){var i,o=t[n];return r(r({},e),((i={})[n]="string"==typeof o?parseInt(o):o,i))}),{})};export{t as dimensionsToNumber};

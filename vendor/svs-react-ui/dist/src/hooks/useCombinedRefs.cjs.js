@@ -1,0 +1,1 @@
+"use client";"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var e=require("react");exports.default=function(){for(var r=[],t=0;t<arguments.length;t++)r[t]=arguments[t];var u=e.useRef(null);return e.useEffect((function(){r.forEach((function(e){e&&("function"==typeof e?e(u.current):e.current=u.current)}))}),[r]),u};

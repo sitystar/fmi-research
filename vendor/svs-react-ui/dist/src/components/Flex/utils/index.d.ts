@@ -1,0 +1,1 @@
+export { isPresetSize } from './isPresetSize';

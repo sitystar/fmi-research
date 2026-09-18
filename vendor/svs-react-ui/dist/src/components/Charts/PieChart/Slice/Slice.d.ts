@@ -1,0 +1,21 @@
+import { MouseEventHandler } from 'react';
+import * as d3 from 'd3';
+import '../PieChart.scss';
+import { CHART_COLORS } from '../../charts.const';
+import { PieChartItem } from '../..';
+type ChartColorType = (typeof CHART_COLORS)[number];
+export type SliceProps = {
+    customColor?: string;
+    color?: ChartColorType;
+    highlighted?: boolean;
+    pointer?: boolean;
+    innerRadius: number;
+    outerRadius: number;
+    slice: d3.PieArcDatum<PieChartItem>;
+    hover: boolean;
+    hoverWithLegend: boolean;
+    onSliceMouseEnter?: MouseEventHandler<SVGGElement>;
+    onSliceMouseLeave?: () => void;
+};
+export declare const Slice: ({ slice, outerRadius, innerRadius, customColor, color, pointer, highlighted, onSliceMouseEnter, onSliceMouseLeave }: SliceProps) => import("react/jsx-runtime").JSX.Element;
+export {};

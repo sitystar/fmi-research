@@ -1,0 +1,1 @@
+"use client";"use strict";exports.CHART_CATEGORY_FIELD_DEFAULT="category",exports.CHART_COLORS=["processing","error","success","warning","default","secondary","tertiary","quaternary","extra","additionally"],exports.CHART_MARGIN_DEGAULT={top:20,right:20,bottom:35,left:55};

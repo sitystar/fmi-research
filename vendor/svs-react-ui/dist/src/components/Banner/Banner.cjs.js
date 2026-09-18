@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("tslib"),s=require("react/jsx-runtime"),n=require("../InlineMessage/InlineMessage.cjs.js");exports.Banner=function(r){return s.jsx(n.InlineMessage,e.__assign({},r))};

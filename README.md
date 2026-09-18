@@ -26,10 +26,14 @@
 | `app/ide/fmi_tank/` |проекта flogic IDE |
 
 
-## Десктопное приложение GUI (.deb, с инсталлятором)
+## Веб-интерфейс в стиле Severstal UI (deb, ветка gui/web-react)
 
-`scripts/fmi_gui.py` упаковывается в самодостаточное приложение (python/tkinter
-— внутри бинарника, на целевой машине ставить ничего не нужно):
+`web/` — React-приложение на внутренней библиотеке компонентов `svs-react-ui`
+(тема ick, vendored сборка в `vendor/`). Локальный сервер `scripts/fmi_server.py`
+(FastAPI, 127.0.0.1:8765) даёт REST/WS API и раздаёт статику; deb ставит
+сервер + интерфейс + связыватель, лаунчер открывает браузер. Данные — там же,
+в `~/fmi-coupling`. Прежний tkinter-GUI (`scripts/fmi_gui.py`) остаётся в
+репозитории как резервный.
 
 ```bash
 # машина сборки (однократно): sudo apt install -y python3-tk python3-pip binutils

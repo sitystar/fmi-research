@@ -1,0 +1,1 @@
+"use client";import t from"classnames";import{skeletonClassName as c}from"./Skeleton.consts.esm.js";var o=function(o,a){var n=o?"active":"static";return t(c,"".concat(c,"--").concat(n),a&&"".concat(c,"--").concat(n,"-vertical"))};export{o as skeletonCommonClass};

@@ -1,0 +1,1 @@
+"use client";"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var e=".svs-flex{display:flex}.svs-flex--gap-l{gap:var(--flex-padding-gap-l,32px)}.svs-flex--gap-m{gap:var(--flex-padding-gap-m,24px)}.svs-flex--gap-s{gap:var(--flex-padding-gap-s,16px)}";require("style-inject")(e),exports.default=e;

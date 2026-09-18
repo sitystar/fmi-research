@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("../Table.cjs.js");exports.allElementBlur=function(){var e=document.activeElement;e&&e.blur()},exports.getRowsById=function(r,t,n){if(!r||!(null==t?void 0:t.length))return[];var l=Array.isArray(r)?r:[r];return t.filter((function(r){return l.includes(r[null!=n?n:e.DEFAULT_KEY_NAME])}))};

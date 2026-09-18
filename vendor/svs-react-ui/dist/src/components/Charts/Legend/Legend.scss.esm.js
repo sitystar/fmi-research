@@ -1,0 +1,1 @@
+"use client";import e from"style-inject";var t=".svs-charts-legend{align-items:center;column-gap:var(--chart-padding-between-objects,16px);display:flex;flex-flow:row wrap;justify-content:center;text-align:center;width:100%}.svs-charts-legend__aside{align-items:flex-start;flex-direction:column;width:min-content}";e(t);export{t as default};

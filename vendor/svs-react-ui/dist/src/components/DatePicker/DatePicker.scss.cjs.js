@@ -1,0 +1,1 @@
+"use client";"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var e=".svs-datepicker{display:inline-flex;flex-direction:column;position:relative;row-gap:var(--input-2-padding-between,4px)}.svs-datepicker-popover .svs-calendar{left:0;z-index:10}.svs-datepicker__calendar-icon{outline:none}";require("style-inject")(e),exports.default=e;

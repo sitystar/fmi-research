@@ -1,0 +1,1 @@
+"use client";import{__rest as r,__assign as e}from"tslib";import{jsx as m}from"react/jsx-runtime";import{ThemeProvider as t}from"./ThemeProvider.esm.js";import{DEFAULT_THEME as i}from"../../themes/default.esm.js";var o=function(o){var n=o.children,s=r(o,["children"]);return m(t,e({theme:i},s,{children:n}))};export{o as DefaultThemeProvider};

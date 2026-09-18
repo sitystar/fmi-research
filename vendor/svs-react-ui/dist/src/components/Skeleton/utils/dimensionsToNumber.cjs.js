@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("tslib");exports.dimensionsToNumber=function(r){return Object.keys(r).reduce((function(s,n){var t,i=r[n];return e.__assign(e.__assign({},s),((t={})[n]="string"==typeof i?parseInt(i):i,t))}),{})};

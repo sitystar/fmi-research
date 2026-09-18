@@ -1,0 +1,1 @@
+"use client";import{millisecondsInDay as r,millisecondsInHour as t,millisecondsInMinute as e}from"../Gantt.const.esm.js";function n(n){var u=String(n.value).split(":"),m=u[0],i=u[1],o=u[2];return Number(m)*r+Number(i)*t+Number(o)*e}export{n as calcIntervalDurationMs};

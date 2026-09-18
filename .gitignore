@@ -51,4 +51,8 @@ gui_state.json
 
 # артефакты сборки GUI-приложения
 build-gui/
-dist/
+/dist/
+
+# веб-интерфейс: зависимости и сборка
+web/node_modules/
+web/dist/

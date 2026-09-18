@@ -1,0 +1,1 @@
+"use client";"use strict";exports.PIECHART_INFLEXION_PADDING=20,exports.PIECHART_INNER_RADIUS_SCALE=1.6,exports.PIECHART_MARGIN=20,exports.PIECHART_TYPE_DEFAULT="standard";

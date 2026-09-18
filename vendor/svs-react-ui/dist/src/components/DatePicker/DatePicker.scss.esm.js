@@ -1,0 +1,1 @@
+"use client";import e from"style-inject";var i=".svs-datepicker{display:inline-flex;flex-direction:column;position:relative;row-gap:var(--input-2-padding-between,4px)}.svs-datepicker-popover .svs-calendar{left:0;z-index:10}.svs-datepicker__calendar-icon{outline:none}";e(i);export{i as default};

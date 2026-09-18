@@ -1,0 +1,1 @@
+"use client";import e from"style-inject";var i=".svs-radio-group{display:inline-flex;flex-direction:column;gap:10px}.svs-radio-group--button{display:flex;flex-direction:row;gap:0}.svs-radio-group--inline{flex-direction:row;gap:15px}";e(i);export{i as default};

@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("tslib"),s=require("react"),r=require("classnames");exports.cloneWithClasses=function(i,n){if(!i)return null;if(!s.isValidElement(i))return i;var a=i;return s.cloneElement(a,e.__assign(e.__assign({},a.props),{className:r(a.props.className,n)}))};

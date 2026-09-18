@@ -1,0 +1,1 @@
+"use client";import{useState as n,useEffect as e}from"react";var i=function(){var i=n(window.innerWidth<=768),r=i[0],t=i[1];return e((function(){var n=function(){t(window.innerWidth<=768)};return window.addEventListener("resize",n),function(){window.removeEventListener("resize",n)}}),[]),r};export{i as default};
