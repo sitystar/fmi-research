@@ -224,7 +224,27 @@ for ui_dir in (os.path.join(core.ROOT, "web", "dist"),
         break
 
 
+def _seed_models():
+    """При первом запуске — скопировать образцы FMU из /opt в рабочий каталог."""
+    opt_models = "/opt/fmi-coupling/models"
+    user_models = os.path.join(core.MODELS_DIR)
+    if not os.path.isdir(opt_models) or not os.path.isdir(user_models):
+        return
+    existing = [f for f in os.listdir(user_models) if f.endswith(".fmu.dir")]
+    if existing:
+        return  # уже есть модели — не трогаем
+    import shutil
+    for d in os.listdir(opt_models):
+        if d.endswith(".fmu.dir"):
+            src = os.path.join(opt_models, d)
+            dst = os.path.join(user_models, d)
+            if not os.path.isdir(dst):
+                shutil.copytree(src, dst)
+                print(f"seed: {d}")
+
+
 if __name__ == "__main__":
+    _seed_models()
     import threading
     import time as _time
     import urllib.request
