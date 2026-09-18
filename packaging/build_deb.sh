@@ -19,8 +19,6 @@ VER=2.0.0
 APP=fmi-coupling-gui
 
 command -v "$PY" >/dev/null || { echo "нет /usr/bin/python3" >&2; exit 2; }
-"$PY" -c "import tkinter" 2>/dev/null || {
-  echo "НЕТ tkinter: sudo apt install -y python3-tk" >&2; exit 2; }
 "$PY" -m PyInstaller --version >/dev/null 2>&1 || {
   echo "ставлю pyinstaller (--user)..."; "$PY" -m pip install ${FMI_GUI_PIP_OPTS:---user} pyinstaller; }
 
