@@ -1,0 +1,1 @@
+"use client";import{__assign as r}from"tslib";import{isValidElement as s,cloneElement as t}from"react";import e from"classnames";function o(o,m){if(!o)return null;if(!s(o))return o;var a=o;return t(a,r(r({},a.props),{className:e(a.props.className,m)}))}export{o as cloneWithClasses};

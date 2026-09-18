@@ -1,0 +1,1 @@
+"use client";"use strict";exports.roundToPrecision=function(r,e){if("number"!=typeof r||Number.isNaN(r))throw new Error("Значение должно быть валидным числом");if(!Number.isInteger(e))throw new Error("maxDecimalPlaces должно быть неотрицательным целым числом");var o=Math.pow(10,e);return Math.round(r*o)/o};

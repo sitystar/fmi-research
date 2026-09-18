@@ -1,0 +1,1 @@
+"use client";var a="standard",e=20,r=20,t=1.6;export{r as PIECHART_INFLEXION_PADDING,t as PIECHART_INNER_RADIUS_SCALE,e as PIECHART_MARGIN,a as PIECHART_TYPE_DEFAULT};

@@ -1,0 +1,25 @@
+@use 'sass:map';
+
+$z-index: (
+  'popover': 1050,
+  'drawer': 1000,
+  'blanket': 1000,
+  'modal': 1000,
+  'popup': 1030,
+  'tooltip': 1070,
+  'notification': 2050,
+  'dropdown': 1050,
+  'popconfirm': 1060,
+  'datepicker': 1050,
+  'timepicker': 1050,
+  'dragOverlay': 1000,
+  'sideMenuServices': 900
+) !default;
+
+@function z-index($key, $offset: 0) {
+  @return map.get($z-index, $key) + $offset;
+}
+
+@mixin z-index($key, $offset: 0) {
+  z-index: z-index($key, $offset);
+}

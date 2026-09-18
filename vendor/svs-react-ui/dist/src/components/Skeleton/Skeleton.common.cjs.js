@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("classnames"),s=require("./Skeleton.consts.cjs.js");exports.skeletonCommonClass=function(t,a){var c=t?"active":"static";return e(s.skeletonClassName,"".concat(s.skeletonClassName,"--").concat(c),a&&"".concat(s.skeletonClassName,"--").concat(c,"-vertical"))};

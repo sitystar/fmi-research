@@ -1,0 +1,1 @@
+"use client";import o from"classnames";import{tagClassName as c}from"./Tag.consts.esm.js";var n=function(n,t,a,e){return o(c,"".concat(c,"--").concat(n),t&&"".concat(c,"--rounded"),a&&"".concat(c,"--closable"),Boolean(e)&&"".concat(c,"--icon"))};export{n as getTagCommonClassNames};

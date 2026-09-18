@@ -1,0 +1,4 @@
+$animate-expanded-icon-speed: 0.15s;
+
+//анимация поворота шеврона
+$transition-expand-icon: transform $animate-expanded-icon-speed ease;

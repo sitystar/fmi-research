@@ -1,0 +1,1 @@
+"use client";var t=function(t){var e=getComputedStyle(t),r=parseFloat(e.borderTopWidth)+parseFloat(e.borderBottomWidth),o=parseFloat(e.borderLeftWidth)+parseFloat(e.borderRightWidth);return{horizontal:t.offsetHeight-t.clientHeight-r,vertical:t.offsetWidth-t.clientWidth-o}};export{t as getScrollbarSizes};

@@ -1,0 +1,1 @@
+"use client";"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var e=".svs-header__button-with-count{position:relative}.svs-header__button-with-count-counter{border:2px solid var(--theme-background-primary,#fff);border-radius:var(--border-radius-l,9999px);position:absolute;right:-2px;top:-2px}";require("style-inject")(e),exports.default=e;

@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("tslib"),n=function(t,i,r){return t.reduce((function(t,l){var c=l.id,s=l._children,u=r?l[r]:null,a=e.__assign(e.__assign({id:c},i[c]),{legendField:u,childrenLength:s&&s.length});return t=t.concat(a),(null==s?void 0:s.length)&&i[c].opened&&(t=t.concat(s&&n(s,i,r))),t}),[])};exports.createTableRowsMap=n;

@@ -1,0 +1,1 @@
+"use client";import e from"style-inject";var a=".svs-flex{display:flex}.svs-flex--gap-l{gap:var(--flex-padding-gap-l,32px)}.svs-flex--gap-m{gap:var(--flex-padding-gap-m,24px)}.svs-flex--gap-s{gap:var(--flex-padding-gap-s,16px)}";e(a);export{a as default};

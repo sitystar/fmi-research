@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("../Gantt.const.cjs.js");exports.roundTime=function(n,t){var i=t>e.millisecondsInHour?n.getTimezoneOffset()*e.millisecondsInMinute:0,s=new Date(Math.round(n.getTime()/t)*t+i),o=new Date(s.getTime()-(s.getDay()-1)*e.millisecondsInDay);return t<e.millisecondsInWeek?s:o};

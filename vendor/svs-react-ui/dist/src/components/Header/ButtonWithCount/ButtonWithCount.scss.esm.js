@@ -1,0 +1,1 @@
+"use client";import e from"style-inject";var t=".svs-header__button-with-count{position:relative}.svs-header__button-with-count-counter{border:2px solid var(--theme-background-primary,#fff);border-radius:var(--border-radius-l,9999px);position:absolute;right:-2px;top:-2px}";e(t);export{t as default};

@@ -1,0 +1,1 @@
+"use client";var r="category",t={top:20,right:20,bottom:35,left:55},e=["processing","error","success","warning","default","secondary","tertiary","quaternary","extra","additionally"];export{r as CHART_CATEGORY_FIELD_DEFAULT,e as CHART_COLORS,t as CHART_MARGIN_DEGAULT};

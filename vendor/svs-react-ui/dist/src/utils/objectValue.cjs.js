@@ -1,0 +1,1 @@
+"use client";"use strict";exports.getObjectValue=function(e,t){void 0===t&&(t=[]);for(var r=e,n=0;n<t.length;n+=1){if(null==r)return;r=r[t[n]]}return r},exports.setObjectValue=function(e,t,r){for(var n=e,u=0;u<t.length-1;u++){var o=t[u];n[o]&&"object"==typeof n[o]||(n[o]={}),n=n[o]}return n[t[t.length-1]]=r,e};

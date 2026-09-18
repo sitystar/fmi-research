@@ -1,0 +1,1 @@
+"use client";"use strict";var a=require("classnames"),s=require("./Tag.consts.cjs.js");exports.getTagCommonClassNames=function(e,c,t,n){return a(s.tagClassName,"".concat(s.tagClassName,"--").concat(e),c&&"".concat(s.tagClassName,"--rounded"),t&&"".concat(s.tagClassName,"--closable"),Boolean(n)&&"".concat(s.tagClassName,"--icon"))};

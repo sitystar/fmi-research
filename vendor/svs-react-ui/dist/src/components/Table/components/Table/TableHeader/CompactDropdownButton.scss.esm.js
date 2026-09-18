@@ -1,0 +1,1 @@
+"use client";import e from"style-inject";var l=".svs-table__main-table-header-cell-compact-dropdown{box-sizing:border-box;color:var(--theme-table-2-cell-header-icon-chevron-default-col-default,#909090);cursor:pointer;display:flex;height:var(--table-2-cell-header-icon-size,16px);line-height:0;width:var(--table-2-cell-header-icon-size,16px)}";e(l);export{l as default};

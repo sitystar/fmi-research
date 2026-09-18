@@ -1,0 +1,1 @@
+export { dimensionsToNumber } from './dimensionsToNumber';

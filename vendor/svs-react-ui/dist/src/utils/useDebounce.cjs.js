@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("react");exports.useDebounce=function(r,t){var u=e.useRef(void 0);return e.useCallback((function(){for(var e=[],n=0;n<arguments.length;n++)e[n]=arguments[n];clearTimeout(u.current),u.current=setTimeout((function(){return r.apply(void 0,e)}),t)}),[r,t])};

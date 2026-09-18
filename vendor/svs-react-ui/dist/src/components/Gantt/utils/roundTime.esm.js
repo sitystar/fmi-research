@@ -1,0 +1,1 @@
+"use client";import{millisecondsInHour as e,millisecondsInMinute as t,millisecondsInDay as n,millisecondsInWeek as o}from"../Gantt.const.esm.js";function r(r,a){var i=a>e?r.getTimezoneOffset()*t:0,m=new Date(Math.round(r.getTime()/a)*a+i),s=new Date(m.getTime()-(m.getDay()-1)*n);return a<o?m:s}export{r as roundTime};

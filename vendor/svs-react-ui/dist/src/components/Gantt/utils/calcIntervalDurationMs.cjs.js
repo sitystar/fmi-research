@@ -1,0 +1,1 @@
+"use client";"use strict";var e=require("../Gantt.const.cjs.js");exports.calcIntervalDurationMs=function(n){var r=String(n.value).split(":"),s=r[0],i=r[1],t=r[2];return Number(s)*e.millisecondsInDay+Number(i)*e.millisecondsInHour+Number(t)*e.millisecondsInMinute};
