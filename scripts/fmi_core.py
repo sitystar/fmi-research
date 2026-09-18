@@ -42,7 +42,6 @@ def _looks_like_root(p):
 
 def resolve_root():
     """Где лежит fmi-research: env → ~/.config → рядом со скриптом (режим разработки)."""
-    import glob
     candidates = []
     env = os.environ.get("FMI_RESEARCH_HOME")
     if env:
@@ -51,12 +50,13 @@ def resolve_root():
         candidates.append(os.path.normpath(os.path.abspath(json.load(open(CONFIG_PATH))["root"])))
     except Exception:
         pass
-    # режим разработки: скрипт лежит внутри fmi-research/scripts
+    # режим разработки: только если скрипт запущен из репозитория напрямую
+    # (в PyInstaller __file__ — временный каталог, проверка не сработает)
     here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if _looks_like_root(here):
+    if os.path.isdir(os.path.join(here, "build-fmitb")) and os.path.isdir(os.path.join(here, "models")):
         candidates.append(here)
-    # типичные места рядом с домашней папкой
-    candidates += sorted(glob.glob(os.path.expanduser("~/*/fmi-research")))
+    # ВСЕГДА последним кандидатом — ~/fmi-coupling (каталог данных по умолчанию)
+    candidates.append(DEFAULT_WORKDIR)
     for c in candidates:
         if c and _looks_like_root(c):
             return c
