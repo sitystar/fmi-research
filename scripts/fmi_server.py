@@ -111,6 +111,18 @@ def api_status():
 _params_cache = {"out_port": 1499, "in_port": 1500}
 
 
+@app.post("/api/root")
+def api_root(body: dict):
+    path = body.get("path", "")
+    if not core._looks_like_root(path):
+        return JSONResponse(status_code=400,
+                            content={"error": "нет каталогов models/build-fmitb — это не рабочий каталог"})
+    path = os.path.normpath(path)
+    core._apply_root(path)
+    core.remember_root(path)
+    return {"root": core.ROOT}
+
+
 @app.post("/api/run")
 def api_run(body: dict):
     if run_state.running:
