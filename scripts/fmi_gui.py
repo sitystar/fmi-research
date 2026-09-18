@@ -1,247 +1,32 @@
 #!/usr/bin/env python3
 # Автор: Evgenii I, 2026
+"""Графический интерфейс (tkinter) связки Flogic (IEC 61499, forte) ↔ FMU.
+
+Логика — в fmi_core.py (общая с веб-сервером fmi_server.py).
+Запуск: /usr/bin/python3 scripts/fmi_gui.py   (нужен python3-tk)
+Без GUI (проверка логики): python3 fmi_core.py --scan | --args <Имя> | --plot-test <csv>
 """
-Графический интерфейс связки FORTE ↔ FMU (fmi-research).
-
-Возможности:
-  · импорт FMU: выбор .fmu → распаковка в models/<имя>.fmu.dir;
-  · список импортированных моделей (сканирование models/);
-  · выбор переменных (входы/выходы) и параметров запуска, которые раньше
-    задавались в консоли (порты, длительность, lookAhead, лог);
-  · запуск/остановка FMITerminalBlock, живой хвост лога, открытие trace.
-
-АРХИТЕКТУРНОЕ ПРАВИЛО: Flogic (IEC 61499, forte) (IEC 61499, forte) запускается и останавливается ТОЛЬКО оркестратором.
-GUI лишь проверяет готовность его портов и управляет FMITerminalBlock.
-
-Запуск: /usr/bin/python3 scripts/fmi_gui.py        (нужен пакет python3-tk)
-Без GUI (проверка логики): --scan | --args <ИмяМодели>
-"""
-import json
 import os
-import queue
-import shutil
-import socket
-import subprocess
 import sys
-import threading
-import zipfile
-import xml.etree.ElementTree as ET
-from datetime import datetime
 
-CONFIG_PATH = os.path.expanduser("~/.config/fmi-coupling/config.json")
-DEFAULT_WORKDIR = os.path.expanduser("~/fmi-coupling")          # модели и trace
-INSTALLED_FMITB = "/opt/fmi-coupling/fmitb/FMITerminalBlock"    # из deb-пакета
-TYPES = {"Real": "0", "Integer": "1", "Boolean": "2", "String": "3", "Enumeration": "1"}
-
-
-def _apply_root(root):
-    """Переназначить пути. Связыватель: сборка репозитория (режим разработки)
-    или бандл из deb-пакета /opt/fmi-coupling/fmitb."""
-    global ROOT, MODELS_DIR, RUNS_DIR, FMITB, BOOST_LIBS, STATE_FILE
-    ROOT = root
-    MODELS_DIR = os.path.join(ROOT, "models")
-    RUNS_DIR = os.path.join(ROOT, "runs")
-    repo_fmitb = os.path.join(ROOT, "build-fmitb", "FMITerminalBlock")
-    FMITB = repo_fmitb if os.path.isfile(repo_fmitb) else INSTALLED_FMITB
-    BOOST_LIBS = os.path.join(ROOT, "deps", "boost", "usr", "lib", "x86_64-linux-gnu")
-    STATE_FILE = os.path.join(ROOT, "gui_state.json")
-
-
-def _looks_like_root(p):
-    return os.path.isdir(os.path.join(p, "models")) or os.path.isdir(os.path.join(p, "build-fmitb"))
-
-
-def resolve_root():
-    """Где лежит fmi-research: env → ~/.config → рядом со скриптом (режим разработки)."""
-    import glob
-    candidates = []
-    env = os.environ.get("FMI_RESEARCH_HOME")
-    if env:
-        candidates.append(env)
-    try:
-        candidates.append(json.load(open(CONFIG_PATH))["root"])
-    except Exception:
-        pass
-    # режим разработки: скрипт лежит внутри fmi-research/scripts
-    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    if _looks_like_root(here):
-        candidates.append(here)
-    # типичные места рядом с домашней папкой
-    candidates += sorted(glob.glob(os.path.expanduser("~/*/fmi-research")))
-    for c in candidates:
-        if c and _looks_like_root(c):
-            return c
-    return None
-
-
-def remember_root(path):
-    os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-    json.dump({"root": path}, open(CONFIG_PATH, "w"))
-
-
-# стартовая инициализация путей (для режимов без GUI: --scan/--args);
-# в GUI она переигрывается через resolve_root()/_apply_root()
-_apply_root(resolve_root() or os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
-# ---------------------------------------------------------------- модельный слой
-class ModelEntry:
-    def __init__(self, fmu_dir):
-        self.dir = fmu_dir
-        self.name, self.inputs, self.outputs = "", [], []
-        self.parse()
-
-    def parse(self):
-        xml_path = os.path.join(self.dir, "modelDescription.xml")
-        root = ET.parse(xml_path).getroot()
-        self.name = root.get("modelName") or os.path.basename(self.dir)
-        for v in root.iter("ScalarVariable"):
-            typ = next((TYPES[ch.tag] for ch in v if ch.tag in TYPES), None)
-            if typ is None or v.get("name") == "time":
-                continue
-            entry = (v.get("name"), typ)
-            if v.get("causality") == "input":
-                self.inputs.append(entry)
-            elif v.get("causality") == "output":
-                self.outputs.append(entry)
-
-
-def scan_models():
-    if not os.path.isdir(MODELS_DIR):
-        return []
-    out = []
-    for d in sorted(os.listdir(MODELS_DIR)):
-        if d.endswith(".fmu.dir") and os.path.isfile(os.path.join(MODELS_DIR, d, "modelDescription.xml")):
-            try:
-                out.append(ModelEntry(os.path.join(MODELS_DIR, d)))
-            except Exception as e:
-                print(f"пропуск {d}: {e}", file=sys.stderr)
-    return out
-
-
-def import_fmu(src_path, name_override=None):
-    """Распаковка .fmu в models/<stem>.fmu.dir; возвращает ModelEntry."""
-    stem = name_override or os.path.splitext(os.path.basename(src_path))[0]
-    dest = os.path.join(MODELS_DIR, stem + ".fmu.dir")
-    if os.path.exists(dest):
-        shutil.rmtree(dest)
-    os.makedirs(dest, exist_ok=True)
-    with zipfile.ZipFile(src_path) as z:
-        z.extractall(dest)
-    if not os.path.isfile(os.path.join(dest, "modelDescription.xml")):
-        raise RuntimeError("в FMU нет modelDescription.xml — это FMU?")
-    return ModelEntry(dest)
-
-
-def build_argv(entry, inputs, outputs, params):
-    """Аргументы FMITerminalBlock (эквивалент scripts/run_fmu.sh)."""
-    argv = [FMITB, f"fmu.path=file://{entry.dir}", f"fmu.name={entry.name}",
-            "app.startTime=0", "app.directOutputDependency=1"]
-    for i, (v, t) in enumerate(inputs):
-        argv += [f"in.0.{i}={v}", f"in.0.{i}.type={t}",
-                 "in.0.protocol=CompactASN.1-TCP", f"in.0.addr=127.0.0.1:{params['in_port']}"]
-    for i, (v, t) in enumerate(outputs):
-        argv += [f"out.0.{i}={v}", f"out.0.{i}.type={t}",
-                 "out.0.protocol=CompactASN.1-TCP", f"out.0.addr=127.0.0.1:{params['out_port']}"]
-    argv += [f"app.lookAheadTime={params['lookahead']}", f"app.logLevel={params['loglevel']}"]
-    return argv
-
-
-def ports_ready(out_port, in_port):
-    for p in (out_port, in_port):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(0.4)
-            if s.connect_ex(("127.0.0.1", p)) != 0:
-                return False
-    return True
-
-
-def parse_trace(path):
-    """data.csv от FMITB → (имена переменных, времена, {имя: [значения/None]}).
-    Пустая ячейка = значение не менялось → forward-fill предыдущим."""
-    import csv as _csv
-    with open(path, newline="") as f:
-        rdr = _csv.reader(f, delimiter=";")
-        names = next(rdr)[1:]
-        next(rdr)  # строка типов
-        times, cols = [], {n: [] for n in names}
-        last = {n: None for n in names}
-        for r in rdr:
-            if not r or not r[0]:
-                continue
-            try:
-                times.append(float(r[0]))
-            except ValueError:
-                continue
-            for n, v in zip(names, r[1:]):
-                if v != "":
-                    try:
-                        last[n] = float(v)
-                    except ValueError:
-                        pass
-                cols[n].append(last[n])
-    return names, times, cols
-
-
-def load_state():
-    try:
-        return json.load(open(STATE_FILE))
-    except Exception:
-        return {}
-
-
-def save_state(st):
-    try:
-        json.dump(st, open(STATE_FILE, "w"))
-    except Exception:
-        pass
-
-
-# ---------------------------------------------------------------- самопроверка без GUI
-def selftest(argv):
-    if argv[0] == "--scan":
-        for m in scan_models():
-            print(f"{m.name:20s} входы={[v for v, _ in m.inputs]} выходы={[v for v, _ in m.outputs]}")
-        return 0
-    if argv[0] == "--plot-test":
-        names, times, cols = parse_trace(argv[1])
-        print(f"переменных: {len(names)}, точек времени: {len(times)}")
-        for n in names:
-            defined = sum(1 for v in cols[n] if v is not None)
-            vs = [v for v in cols[n] if v is not None]
-            rng = f"{min(vs):.4g}..{max(vs):.4g}" if vs else "-"
-            print(f"  {n:12s} определено {defined}/{len(times)}, диапазон {rng}")
-        return 0
-    if argv[0] == "--args":
-        name = argv[1]
-        m = next((x for x in scan_models() if x.name == name), None)
-        if not m:
-            print(f"модель {name} не найдена", file=sys.stderr)
-            return 2
-        p = dict(in_port=1500, out_port=1499, lookahead=1, loglevel="info")
-        for a in build_argv(m, m.inputs, m.outputs, p):
-            print(a)
-        return 0
-    print(__doc__)
-    return 2
-
+import fmi_core as core
 
 # ---------------------------------------------------------------- GUI
 def run_gui():
     import tkinter as tk
     from tkinter import filedialog, messagebox, ttk
 
-    root_path = resolve_root()
+    root_path = core.resolve_root()
     if not root_path:
         # установленное приложение: рабочий каталог по умолчанию создаём тихо
-        root_path = DEFAULT_WORKDIR
+        root_path = core.DEFAULT_WORKDIR
         os.makedirs(os.path.join(root_path, "models"), exist_ok=True)
         os.makedirs(os.path.join(root_path, "runs"), exist_ok=True)
-        remember_root(root_path)
-    _apply_root(root_path)
+        core.remember_root(root_path)
+    core._apply_root(root_path)
 
-    st = load_state()
-    models = scan_models()
+    st = core.load_state()
+    models = core.scan_models()
     runner = {"proc": None, "logq": queue.Queue(), "run_dir": None, "thread": None}
 
     app = tk.Tk()
@@ -289,10 +74,10 @@ def run_gui():
     def change_root():
         nonlocal root_path
         p = filedialog.askdirectory(title="Каталог fmi-research")
-        if p and _looks_like_root(p):
-            remember_root(p)
+        if p and core._looks_like_root(p):
+            core.remember_root(p)
             root_path = p
-            _apply_root(p)
+            core._apply_root(p)
             dir_var.set(p)
             refresh()
         elif p:
@@ -349,7 +134,7 @@ def run_gui():
 
     def refresh(select=None):
         nonlocal models
-        models = scan_models()
+        models = core.scan_models()
         model_list.delete(0, tk.END)
         for m in models:
             model_list.insert(tk.END, f"{m.name}  ({len(m.inputs)}вх/{len(m.outputs)}вых)")
@@ -365,7 +150,7 @@ def run_gui():
         if not m:
             info.config(text="Выберите модель слева")
             return
-        info.config(text=f"Модель: {m.name}   каталог: {os.path.relpath(m.dir, ROOT)}", wraplength=560)
+        info.config(text=f"Модель: {m.name}   каталог: {os.path.relpath(m.dir, core.ROOT)}", wraplength=560)
         for n, t in m.inputs:
             in_box.insert("", tk.END, values=(f"SD_{len(in_box.get_children())+1}: {n}", "Real" if t == "0" else {"1": "Int", "2": "Bool", "3": "Str"}.get(t, t)))
         for n, t in m.outputs:
@@ -376,12 +161,12 @@ def run_gui():
         if not src:
             return
         try:
-            entry = import_fmu(src)
+            entry = core.import_fmu(src)
         except Exception as e:
             messagebox.showerror("Импорт", f"Не удалось: {e}")
             return
         refresh(select=entry.name)
-        messagebox.showinfo("Импорт", f"Импортировано: {entry.name}\n{os.path.relpath(entry.dir, ROOT)}")
+        messagebox.showinfo("Импорт", f"Импортировано: {entry.name}\n{os.path.relpath(entry.dir, core.ROOT)}")
 
     def params():
         return dict(out_port=int(out_port_var.get()), in_port=int(in_port_var.get()),
@@ -394,21 +179,21 @@ def run_gui():
         if runner["proc"] is not None:
             return
         p = params()
-        if not ports_ready(p["out_port"], p["in_port"]):
+        if not core.ports_ready(p["out_port"], p["in_port"]):
             if not messagebox.askyesno("Flogic (IEC 61499, forte) не найден",
                     f"Порты {p['out_port']}/{p['in_port']} не слушаются.\n"
                     "Flogic (IEC 61499, forte) должен быть запущен оркестратором с приложением.\nЗапустить всё равно?"):
                 return
-        save_state({**p, "duration": dur_var.get()})
+        core.save_state({**p, "duration": dur_var.get()})
         runner["run_dir"] = os.path.join(RUNS_DIR, f"{m.name}-{datetime.now().strftime('%d%H%M%S')}")
         os.makedirs(runner["run_dir"], exist_ok=True)
-        argv = build_argv(m, m.inputs, m.outputs, p)
+        argv = core.build_argv(m, m.inputs, m.outputs, p)
         argv.append(f"app.dataFile={os.path.join(runner['run_dir'], 'data.csv')}")
         env = os.environ.copy()
-        env["LD_LIBRARY_PATH"] = os.path.dirname(FMITB) + os.pathsep + BOOST_LIBS + os.pathsep + env.get("LD_LIBRARY_PATH", "")
+        env["LD_LIBRARY_PATH"] = os.path.dirname(core.FMITB) + os.pathsep + core.BOOST_LIBS + os.pathsep + env.get("LD_LIBRARY_PATH", "")
         logf = open(os.path.join(runner["run_dir"], "fmitb.log"), "w")
         logtxt.config(state=tk.NORMAL); logtxt.delete("1.0", tk.END); logtxt.config(state=tk.DISABLED)
-        runner["proc"] = subprocess.Popen(argv, stdout=logf, stderr=subprocess.STDOUT, env=env, cwd=ROOT)
+        runner["proc"] = subprocess.Popen(argv, stdout=logf, stderr=subprocess.STDOUT, env=env, cwd=core.ROOT)
         dur = float(dur_var.get() or 0)
         threading.Thread(target=_tail, args=(os.path.join(runner["run_dir"], "fmitb.log"), dur, runner["proc"]), daemon=True).start()
         run_btn.config(state=tk.DISABLED); stop_btn.config(state=tk.NORMAL)
@@ -450,7 +235,7 @@ def run_gui():
         if not path:
             return
         try:
-            names, times, cols = parse_trace(path)
+            names, times, cols = core.parse_trace(path)
         except Exception as e:
             messagebox.showerror("График", f"Не удалось прочитать trace: {e}")
             return
@@ -518,7 +303,7 @@ def run_gui():
                 append_log(runner["logq"].get_nowait())
         except queue.Empty:
             pass
-        ok = ports_ready(int(out_port_var.get()), int(in_port_var.get()))
+        ok = core.ports_ready(int(out_port_var.get()), int(in_port_var.get()))
         forte_lbl.config(text=f"Flogic (IEC 61499, forte): {'● готов' if ok else '○ порты не слушаются'}",
                          foreground="#0a0" if ok else "#a00")
         app.after(300, poll_log)
@@ -530,5 +315,5 @@ def run_gui():
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].startswith("--"):
-        sys.exit(selftest(sys.argv[1:]))
+        sys.exit(core.selftest(sys.argv[1:]))
     run_gui()
