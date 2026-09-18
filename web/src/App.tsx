@@ -3,7 +3,7 @@
 // Компоненты и тема ick — svs-react-ui.
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  ThemeProvider, ICK_THEME, Button, Table, InputNumber,
+  ThemeProvider, ICK_THEME, Button, Table, InputNumber, Input,
   Dropdown, InlineMessage, Drawer, LineChart, Switch,
 } from 'svs-react-ui'
 
@@ -208,13 +208,9 @@ export default function App() {
                 <label title="IP-адрес или имя ПК, где запущен Flogic (оркестратор). По умолчанию: этот же ПК."
                        style={{ cursor: 'help' }}>
                   Адрес Flogic<br />
-                  <input value={params.host}
+                  <Input value={params.host}
                          onChange={e => setParams(p => ({ ...p, host: e.target.value }))}
-                         placeholder="127.0.0.1"
-                         style={{ width: 120, padding: '4px 8px', borderRadius: 4,
-                                  border: '1px solid var(--theme-background-secondary, #ccc)',
-                                  background: 'var(--theme-background-primary, #fff)',
-                                  color: 'inherit', fontSize: 13 }} />
+                         placeholder="127.0.0.1" />
                 </label>
                 <label>Порт приёма<br />
                   <InputNumber value={params.out_port} min={1} max={65535}
