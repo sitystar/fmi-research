@@ -48,7 +48,7 @@ def resolve_root():
     if env:
         candidates.append(env)
     try:
-        candidates.append(json.load(open(CONFIG_PATH))["root"])
+        candidates.append(os.path.normpath(os.path.abspath(json.load(open(CONFIG_PATH))["root"])))
     except Exception:
         pass
     # режим разработки: скрипт лежит внутри fmi-research/scripts
@@ -64,6 +64,7 @@ def resolve_root():
 
 
 def remember_root(path):
+    path = os.path.normpath(os.path.abspath(path))
     os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
     json.dump({"root": path}, open(CONFIG_PATH, "w"))
 
