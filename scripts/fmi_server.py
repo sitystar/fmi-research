@@ -10,6 +10,7 @@ REST/WS API поверх fmi_core + раздача статики веб-инт�
 исключительно FMITerminalBlock.
 """
 import asyncio
+import signal
 import threading
 import os
 import subprocess
@@ -258,6 +259,22 @@ def _seed_models():
                 shutil.copytree(src, dst)
                 print(f"seed: {d}")
 
+
+def _cleanup(signum, frame):
+    """SIGTERM/SIGINT: остановить FMITerminalBlock и завершиться."""
+    proc = run_state.proc
+    if proc and proc.poll() is None:
+        proc.terminate()
+        try:
+            proc.wait(5)
+        except Exception:
+            proc.kill()
+    import sys
+    sys.exit(0)
+
+
+signal.signal(signal.SIGTERM, _cleanup)
+signal.signal(signal.SIGINT, _cleanup)
 
 if __name__ == "__main__":
     _seed_models()

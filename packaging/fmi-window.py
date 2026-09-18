@@ -53,6 +53,37 @@ def main():
                 proc.kill()
             sys.exit(1)
 
+    # PID сервера — для гарантированной остановки при закрытии
+    import glob as _glob
+    def _find_server_pids():
+        """Найти все процессы fmi-coupling-server (включая запущенные до окна)."""
+        import subprocess as _sp
+        try:
+            out = _sp.check_output(["pgrep", "-f", "fmi-coupling-server"], text=True).strip()
+            return [int(x) for x in out.split("\n") if x.strip()]
+        except Exception:
+            return []
+
+    def _stop_everything():
+        """Остановить сервер(ы) — SIGTERM, затем SIGKILL если не помогло."""
+        import signal as _sig
+        import time as _t
+        pids = _find_server_pids()
+        if proc and proc.poll() is None:
+            pids.append(proc.pid)
+        for pid in set(pids):
+            try:
+                os.kill(pid, _sig.SIGTERM)
+            except ProcessLookupError:
+                pass
+        _t.sleep(1)
+        for pid in set(pids):
+            try:
+                os.kill(pid, 0)  # ещё жив?
+                os.kill(pid, _sig.SIGKILL)
+            except ProcessLookupError:
+                pass
+
     win = Gtk.Window(title="FMI Coupling — Flogic (IEC 61499, forte) ↔ FMU")
     win.set_default_size(1280, 820)
     win.set_size_request(1024, 600)
@@ -63,12 +94,7 @@ def main():
     win.show_all()
 
     def on_destroy(*_):
-        if proc and proc.poll() is None:
-            proc.terminate()
-            try:
-                proc.wait(5)
-            except subprocess.TimeoutExpired:
-                proc.kill()
+        _stop_everything()
         Gtk.main_quit()
 
     win.connect("destroy", on_destroy)

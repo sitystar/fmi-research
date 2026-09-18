@@ -44,6 +44,8 @@ function BrowseDir({ onPick }: { onPick: (path: string) => void }) {
   )
 }
 
+const SERIES_COLORS = ['#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e', '#8c564b', '#17becf', '#e377c2']
+
 const TYPE_NAME: Record<string, string> = { '0': 'Real', '1': 'Int', '2': 'Bool', '3': 'Str' }
 
 export default function App() {
@@ -57,6 +59,7 @@ export default function App() {
   const [trace, setTrace] = useState<Trace | null>(null)
   const [browse, setBrowse] = useState(false)
   const [showParams, setShowParams] = useState(false)
+  const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set())
   const [paramEdits, setParamEdits] = useState<Record<string, string>>({})
   const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(null)
   const logRef = useRef<HTMLPreElement>(null)
@@ -121,6 +124,7 @@ export default function App() {
   }
 
   const running = status?.running
+  const run_state_model = status?.model
 
   return (
     <ThemeProvider theme={ICK_THEME} dark={dark}>
@@ -334,24 +338,76 @@ export default function App() {
         }} />
       </Drawer>
 
-      <Drawer open={drawer} onClose={() => setDrawer(false)} title="График trace" width={980}
-              placement="right">
-        {trace && trace.decimated && (
-          <LineChart
-            width={920} height={440}
-            data={trace.decimated.times.map((t, i) => {
-              const row: Record<string, number | undefined> = { t: Number(t.toFixed(3)) }
-              for (const n of trace.names) {
-                const v = trace.decimated.series[n][i]
-                row[n] = v === null ? undefined : v
-              }
-              return row
-            })}
-            categoryField="t"
-            series={trace.names.map(n => ({ fieldName: n, label: n }))}
-            showLegend showGridX showGridY />
-        )}
-      </Drawer>
+      {/* трейс: div-overlay (Drawer в WebKit2 убивает GTK-окно) */}
+      {drawer && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000,
+          background: dark ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)',
+          display: 'flex', flexDirection: 'column',
+          padding: 20,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+            <b style={{ fontSize: 16 }}>График trace — {run_state_model || 'последний прогон'}</b>
+            <div style={{ flex: 1 }} />
+            {/* легенда: имя + цвет, клик = вкл/выкл */}
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+              {(trace?.names || []).map((n, i) => {
+                const color = SERIES_COLORS[i % SERIES_COLORS.length]
+                const visible = !hiddenSeries.has(n)
+                return (
+                  <button key={n}
+                          onClick={() => setHiddenSeries(prev => {
+                            const s = new Set(prev)
+                            if (s.has(n)) s.delete(n); else s.add(n)
+                            return s
+                          })}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 4,
+                            background: 'transparent', border: 'none', cursor: 'pointer',
+                            opacity: visible ? 1 : 0.35,
+                            fontSize: 13,
+                          }}>
+                    <span style={{ width: 14, height: 3, background: color, borderRadius: 2 }} />
+                    <span style={{ color: visible ? 'inherit' : '#999' }}>{n}</span>
+                  </button>
+                )
+              })}
+            </div>
+            <Button styleType="secondary" size="s" onClick={() => setDrawer(false)}>✕ Закрыть</Button>
+          </div>
+          {/* график */}
+          <div style={{
+            flex: 1, borderRadius: 8, padding: 12, overflow: 'auto',
+            background: dark ? 'var(--theme-background-primary, #141925)' : '#fff',
+            border: '1px solid var(--theme-background-secondary, #ccc)',
+          }}>
+            {trace && trace.decimated && trace.decimated.times.length > 0 ? (
+              <LineChart
+                width={Math.max(800, window.innerWidth - 80)} height={Math.max(400, window.innerHeight - 160)}
+                data={trace.decimated.times.map((t, i) => {
+                  const row: Record<string, number | undefined> = { t: Number(t.toFixed(3)) }
+                  for (const n of trace.names) {
+                    const v = trace.decimated.series[n][i]
+                    row[n] = v === null ? undefined : v
+                  }
+                  return row
+                })}
+                categoryField="t"
+                series={trace.names
+                  .filter(n => !hiddenSeries.has(n))
+                  .map((n, i) => ({
+                    fieldName: n, label: n,
+                    color: SERIES_COLORS[trace.names.indexOf(n) % SERIES_COLORS.length],
+                  }))}
+                showGridX showGridY />
+            ) : (
+              <div style={{ textAlign: 'center', padding: 40, opacity: 0.5 }}>
+                нет данных — запустите модель или подождите накопления точек
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </ThemeProvider>
   )
 }
