@@ -152,23 +152,33 @@ export default function App() {
 
         {/* основная зона */}
         <div style={{ display: 'flex', gap: 12, flex: 1, minHeight: 0 }}>
-          {/* модели */}
-          <div style={panel({ width: 330, overflow: 'auto' })}><b>Модели</b>
-            <Table
-              data={models.map(m => ({ name: m.name, io: `${m.inputs.length}вх/${m.outputs.length}вых` }))}
-              cols={[
-                { title: 'Имя', name: 'name' },
-                { title: 'вх/вых', name: 'io', width: 100 },
-              ]}
-            />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 3, marginTop: 8, maxHeight: 180, overflowY: 'auto' }}>
-              {models.map(m => (
-                <Button key={m.name} size="xs"
-                        styleType={sel?.name === m.name ? 'primary' : 'secondary'}
-                        onClick={() => setSel(m)}>
-                  {m.name} ({m.inputs.length}/{m.outputs.length})
-                </Button>
-              ))}
+          {/* модели: две раздельные секции */}
+          <div style={{ width: 330, display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
+            {/* верхняя: таблица импортированных моделей (70%) */}
+            <div style={panel({ flex: 7, display: 'flex', flexDirection: 'column', minHeight: 0 })}>
+              <b style={{ marginBottom: 6 }}>Импортированные модели</b>
+              <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+                <Table
+                  data={models.map(m => ({ name: m.name, io: `${m.inputs.length}вх/${m.outputs.length}вых` }))}
+                  cols={[
+                    { title: 'Имя', name: 'name' },
+                    { title: 'вх/вых', name: 'io', width: 100 },
+                  ]}
+                />
+              </div>
+            </div>
+            {/* нижняя: выбор модели для работы (30%, зафиксирована) */}
+            <div style={panel({ flex: 3, display: 'flex', flexDirection: 'column', minHeight: 0 })}>
+              <b style={{ marginBottom: 6 }}>Выбор модели</b>
+              <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                {models.map(m => (
+                  <Button key={m.name} size="xs"
+                          styleType={sel?.name === m.name ? 'primary' : 'secondary'}
+                          onClick={() => setSel(m)}>
+                    {m.name} ({m.inputs.length}/{m.outputs.length})
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
 
