@@ -102,13 +102,13 @@ async def api_import(file: UploadFile):
 def api_status():
     return {"root": core.ROOT,
             "fmitb": core.FMITB,
-            "forte_ready": core.ports_ready(_params_cache["out_port"], _params_cache["in_port"]),
+            "forte_ready": core.ports_ready(_params_cache["out_port"], _params_cache["in_port"], _params_cache.get("host", "127.0.0.1")),
             "running": run_state.running,
             "model": run_state.model,
             "run_dir": run_state.run_dir}
 
 
-_params_cache = {"out_port": 1499, "in_port": 1500}
+_params_cache = {"out_port": 1499, "in_port": 1500, "host": "127.0.0.1"}
 
 
 @app.get("/api/fs")
@@ -148,12 +148,13 @@ def api_run(body: dict):
         return JSONResponse(status_code=404, content={"error": f"модель {name} не найдена"})
     p = dict(out_port=int(body.get("out_port", 1499)),
              in_port=int(body.get("in_port", 1500)),
+             host=body.get("host", "127.0.0.1"),
              lookahead=float(body.get("lookahead", 1)),
              loglevel=body.get("loglevel", "info"))
-    _params_cache.update(out_port=p["out_port"], in_port=p["in_port"])
+    _params_cache.update(out_port=p["out_port"], in_port=p["in_port"], host=p["host"])
     duration = float(body.get("duration", 0) or 0)
 
-    if not core.ports_ready(p["out_port"], p["in_port"]):
+    if not core.ports_ready(p["out_port"], p["in_port"], p["host"]):
         return JSONResponse(status_code=409, content={
             "error": f"Flogic не слушает порты {p['out_port']}/{p['in_port']} "
                      "(должен быть запущен оркестратором с приложением)"})
