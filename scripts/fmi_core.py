@@ -28,6 +28,8 @@ def _apply_root(root):
     или бандл из deb-пакета /opt/fmi-coupling/fmitb."""
     global ROOT, MODELS_DIR, RUNS_DIR, FMITB, BOOST_LIBS, STATE_FILE
     ROOT = root
+    os.makedirs(os.path.join(root, "models"), exist_ok=True)
+    os.makedirs(os.path.join(root, "runs"), exist_ok=True)
     MODELS_DIR = os.path.join(ROOT, "models")
     RUNS_DIR = os.path.join(ROOT, "runs")
     repo_fmitb = os.path.join(ROOT, "build-fmitb", "FMITerminalBlock")
@@ -55,12 +57,9 @@ def resolve_root():
     here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if os.path.isdir(os.path.join(here, "build-fmitb")) and os.path.isdir(os.path.join(here, "models")):
         candidates.append(here)
-    # ВСЕГДА последним кандидатом — ~/fmi-coupling (каталог данных по умолчанию)
-    candidates.append(DEFAULT_WORKDIR)
-    for c in candidates:
-        if c and _looks_like_root(c):
-            return c
-    return None
+    # ~/fmi-coupling — каталог по умолчанию, принимается ВСЕГДА
+    # (структура создаётся при первом обращении)
+    return DEFAULT_WORKDIR
 
 
 def remember_root(path):
@@ -71,7 +70,7 @@ def remember_root(path):
 
 # стартовая инициализация путей (для режимов без GUI: --scan/--args);
 # в GUI она переигрывается через resolve_root()/_apply_root()
-_apply_root(resolve_root() or os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_apply_root(resolve_root())
 
 
 # ---------------------------------------------------------------- модельный слой
