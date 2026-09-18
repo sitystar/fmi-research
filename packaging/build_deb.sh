@@ -27,9 +27,6 @@ cd "$ROOT"
 "$PY" -m pip install ${FMI_GUI_PIP_OPTS:---user} -q fastapi "uvicorn[standard]" python-multipart 2>/dev/null || true
 "$PY" -m PyInstaller --onefile --name fmi-coupling-server \
   --distpath build-gui/dist --workpath build-gui/work --specpath build-gui \
-  --hidden-import=webview.platforms.gtk \
-  --hidden-import=webview.platforms.edgechromium \
-  --collect-all=webview \
   scripts/fmi_server.py
 
 # фронтенд: готовая сборка (CI) или локальная
@@ -46,6 +43,7 @@ PKG="build-gui/pkg/$APP"
 rm -rf build-gui/pkg
 install -D -m 755 "build-gui/dist/fmi-coupling-server"       "$PKG/opt/fmi-coupling/fmi-coupling-server"
 install -D -m 755 packaging/launcher.sh                       "$PKG/opt/fmi-coupling/fmi-coupling"
+install -D -m 755 packaging/fmi-window.py                      "$PKG/opt/fmi-coupling/fmi-window.py"
 
 # FMU-модели (образцы из репозитория)
 for d in "$ROOT"/models/*.fmu.dir; do
@@ -75,7 +73,7 @@ Package: $APP
 Version: $VER
 Architecture: amd64
 Maintainer: Evgenii I <EvgeniiI@localhost>
-Depends: libwebkit2gtk-4.1-0
+Depends: libwebkit2gtk-4.1-0, python3-gi, gir1.2-webkit2-4.1, python3
 Section: science
 Priority: optional
 Description: Web GUI for coupling Flogic (IEC 61499, forte) with FMU models
