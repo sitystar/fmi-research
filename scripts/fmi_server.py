@@ -10,6 +10,7 @@ REST/WS API поверх fmi_core + раздача статики веб-инт�
 исключительно FMITerminalBlock.
 """
 import asyncio
+import threading
 import os
 import subprocess
 import time
