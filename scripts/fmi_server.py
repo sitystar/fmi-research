@@ -225,5 +225,39 @@ for ui_dir in (os.path.join(core.ROOT, "web", "dist"),
 
 
 if __name__ == "__main__":
-    print(f"fmi-coupling server → http://127.0.0.1:{PORT}  (корень: {core.ROOT})")
-    uvicorn.run(app, host="127.0.0.1", port=PORT, log_level="warning")
+    import threading
+    import time as _time
+    import urllib.request
+
+    def _serve():
+        uvicorn.run(app, host="127.0.0.1", port=PORT, log_level="warning")
+
+    threading.Thread(target=_serve, daemon=True).start()
+
+    # ждём готовности сервера
+    for _ in range(60):
+        _time.sleep(0.25)
+        try:
+            urllib.request.urlopen(f"http://127.0.0.1:{PORT}/api/status", timeout=1)
+            break
+        except Exception:
+            continue
+
+    try:
+        import webview
+        webview.create_window(
+            "FMI Coupling — Flogic (IEC 61499, forte) ↔ FMU",
+            f"http://127.0.0.1:{PORT}",
+            width=1280, height=820, min_size=(1024, 600),
+        )
+        webview.start()  # блокирующий вызов; окно закрыто → сервер останавливается
+    except ImportError:
+        # запасной вариант: браузер
+        import webbrowser
+        print(f"fmi-coupling server → http://127.0.0.1:{PORT}  (корень: {core.ROOT})")
+        webbrowser.open(f"http://127.0.0.1:{PORT}")
+        try:
+            while True:
+                _time.sleep(1)
+        except KeyboardInterrupt:
+            pass

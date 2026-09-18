@@ -66,7 +66,7 @@ Package: $APP
 Version: $VER
 Architecture: amd64
 Maintainer: Evgenii I <EvgeniiI@localhost>
-Depends:
+Depends: libwebkit2gtk-4.1-0
 Section: science
 Priority: optional
 Description: Web GUI for coupling Flogic (IEC 61499, forte) with FMU models

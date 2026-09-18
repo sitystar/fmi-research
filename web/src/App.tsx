@@ -3,8 +3,8 @@
 // Компоненты и тема ick — svs-react-ui.
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  ThemeProvider, ICK_THEME, Button, Table, InputNumber,
-  Dropdown, InlineMessage, Drawer, LineChart,
+  ThemeProvider, ICK_THEME, DEFAULT_THEME, Button, Table, InputNumber,
+  Dropdown, InlineMessage, Drawer, LineChart, Switch,
 } from 'svs-react-ui'
 
 const panel = (extra?: React.CSSProperties): React.CSSProperties => ({
@@ -16,6 +16,8 @@ import { api, subscribeLogs, ModelInfo, Status, Trace } from './api'
 const TYPE_NAME: Record<string, string> = { '0': 'Real', '1': 'Int', '2': 'Bool', '3': 'Str' }
 
 export default function App() {
+  const [dark, setDark] = useState(() => localStorage.getItem('theme') !== 'light')
+  const theme = dark ? ICK_THEME : DEFAULT_THEME
   const [models, setModels] = useState<ModelInfo[]>([])
   const [sel, setSel] = useState<ModelInfo | null>(null)
   const [status, setStatus] = useState<Status | null>(null)
@@ -88,13 +90,17 @@ export default function App() {
   const running = status?.running
 
   return (
-    <ThemeProvider theme={ICK_THEME}>
+    <ThemeProvider theme={theme}>
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', gap: 8, padding: 12, boxSizing: 'border-box' }}>
         {/* шапка */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <b style={{ fontSize: 18 }}>fmi-coupling — Flogic (IEC 61499, forte) ↔ FMU</b>
           <span style={{ opacity: 0.8, fontSize: 13 }}>каталог: {status?.root}</span>
           <div style={{ flex: 1 }} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+            <span>{dark ? 'ick' : 'default'}</span>
+            <Switch checked={dark} onChange={e => { setDark(e.target.checked); localStorage.setItem("theme", e.target.checked ? "dark" : "light") }} />
+          </label>
           <Button styleType="secondary" onClick={() => fileRef.current?.click()}>Импорт FMU…</Button>
           <input ref={fileRef} type="file" accept=".fmu" style={{ display: 'none' }}
                  onChange={e => { doImport(e.target.files?.[0]); e.target.value = '' }} />
