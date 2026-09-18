@@ -27,6 +27,9 @@ cd "$ROOT"
 "$PY" -m pip install ${FMI_GUI_PIP_OPTS:---user} -q fastapi "uvicorn[standard]" python-multipart 2>/dev/null || true
 "$PY" -m PyInstaller --onefile --name fmi-coupling-server \
   --distpath build-gui/dist --workpath build-gui/work --specpath build-gui \
+  --hidden-import=webview.platforms.gtk \
+  --hidden-import=webview.platforms.edgechromium \
+  --collect-all=webview \
   scripts/fmi_server.py
 
 # фронтенд: готовая сборка (CI) или локальная
@@ -43,6 +46,12 @@ PKG="build-gui/pkg/$APP"
 rm -rf build-gui/pkg
 install -D -m 755 "build-gui/dist/fmi-coupling-server"       "$PKG/opt/fmi-coupling/fmi-coupling-server"
 install -D -m 755 packaging/launcher.sh                       "$PKG/opt/fmi-coupling/fmi-coupling"
+
+# FMU-модели (образцы из репозитория)
+for d in "$ROOT"/models/*.fmu.dir; do
+  [ -d "$d" ] && cp -r "$d" "$PKG/opt/fmi-coupling/models/"
+done
+mkdir -p "$PKG/opt/fmi-coupling/models"
 mkdir -p "$PKG/opt/fmi-coupling/ui"
 cp -r "$WEB_SRC"/.                                         "$PKG/opt/fmi-coupling/ui/"
 

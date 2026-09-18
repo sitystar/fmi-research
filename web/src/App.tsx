@@ -3,7 +3,7 @@
 // Компоненты и тема ick — svs-react-ui.
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  ThemeProvider, ICK_THEME, DEFAULT_THEME, Button, Table, InputNumber,
+  ThemeProvider, ICK_THEME, Button, Table, InputNumber,
   Dropdown, InlineMessage, Drawer, LineChart, Switch,
 } from 'svs-react-ui'
 
@@ -16,8 +16,7 @@ import { api, subscribeLogs, ModelInfo, Status, Trace } from './api'
 const TYPE_NAME: Record<string, string> = { '0': 'Real', '1': 'Int', '2': 'Bool', '3': 'Str' }
 
 export default function App() {
-  const [dark, setDark] = useState(() => localStorage.getItem('theme') !== 'light')
-  const theme = dark ? ICK_THEME : DEFAULT_THEME
+  const [dark, setDark] = useState(() => localStorage.getItem('theme') === 'dark')
   const [models, setModels] = useState<ModelInfo[]>([])
   const [sel, setSel] = useState<ModelInfo | null>(null)
   const [status, setStatus] = useState<Status | null>(null)
@@ -90,8 +89,14 @@ export default function App() {
   const running = status?.running
 
   return (
-    <ThemeProvider theme={theme}>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', gap: 8, padding: 12, boxSizing: 'border-box' }}>
+    <ThemeProvider theme={ICK_THEME} dark={dark}>
+      <div style={{
+        display: 'flex', flexDirection: 'column', height: '100vh',
+        gap: 8, padding: 12, boxSizing: 'border-box',
+        background: 'var(--background, inherit)',
+        color: 'var(--text-primary, inherit)',
+        transition: 'background 0.2s, color 0.2s',
+      }}>
         {/* шапка */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <b style={{ fontSize: 18 }}>fmi-coupling — Flogic (IEC 61499, forte) ↔ FMU</b>
