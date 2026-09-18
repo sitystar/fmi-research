@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ThemeProvider, ICK_THEME, Button, Table, InputNumber, Input,
-  Dropdown, InlineMessage, Drawer, LineChart, Switch,
+  Dropdown, InlineMessage, Drawer, Switch,
 } from 'svs-react-ui'
 
 const panel = (extra?: React.CSSProperties): React.CSSProperties => ({
@@ -41,6 +41,96 @@ function BrowseDir({ onPick }: { onPick: (path: string) => void }) {
         {data.dirs.length === 0 && <div style={{ opacity: 0.5, padding: 8 }}>поддиректорий нет</div>}
       </div>
     </div>
+  )
+}
+
+
+function SvgChart({ trace, hidden, dark }: {
+  trace: Trace | null
+  hidden: Set<string>
+  dark: boolean
+}) {
+  if (!trace || !trace.decimated || trace.decimated.times.length < 2) {
+    return <div style={{ textAlign: 'center', padding: 40, opacity: 0.5, color: dark ? '#8b949e' : '#666' }}>
+      нет данных для отображения
+    </div>
+  }
+
+  const d = trace.decimated
+  const times = d.times
+  const names = trace.names.filter(n => !hidden.has(n))
+  if (names.length === 0) return <div style={{ textAlign: 'center', padding: 40, opacity: 0.5 }}>все графики скрыты</div>
+
+  // вычисляем границы
+  let ymin = Infinity, ymax = -Infinity
+  for (const n of names) {
+    for (const v of d.series[n] || []) {
+      if (v !== null && v !== undefined && isFinite(v)) {
+        if (v < ymin) ymin = v
+        if (v > ymax) ymax = v
+      }
+    }
+  }
+  if (ymin === Infinity) { ymin = 0; ymax = 1 }
+  if (ymin === ymax) ymax = ymin + 1
+  const tmin = times[0], tmax = times[times.length - 1]
+  const tSpan = tmax - tmin || 1
+  const ySpan = ymax - ymin
+
+  // размеры
+  const W = 1000, H = 500
+  const ML = 60, MR = 15, MT = 15, MB = 35
+  const PW = W - ML - MR, PH = H - MT - MB
+
+  const X = (t: number) => ML + ((t - tmin) / tSpan) * PW
+  const Y = (v: number) => MT + PH - ((v - ymin) / ySpan) * PH
+
+  const gridColor = dark ? '#21262d' : '#e1e4e8'
+  const textColor = dark ? '#8b949e' : '#586069'
+  const axisColor = dark ? '#30363d' : '#d1d5da'
+
+  // полилинии для каждой серии
+  const lines = names.map((n, idx) => {
+    const color = SERIES_COLORS[trace.names.indexOf(n) % SERIES_COLORS.length]
+    const points: string[] = []
+    for (let i = 0; i < times.length; i++) {
+      const v = d.series[n]?.[i]
+      if (v !== null && v !== undefined && isFinite(v)) {
+        points.push(`${X(times[i]).toFixed(1)},${Y(v).toFixed(1)}`)
+      }
+    }
+    return { color, name: n, points: points.join(' ') }
+  }).filter(l => l.points.length > 0)
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: '100%' }}>
+      {/* сетка */}
+      {Array.from({ length: 6 }, (_, i) => {
+        const y = MT + (i / 5) * PH
+        return <g key={`gy${i}`}>
+          <line x1={ML} y1={y} x2={W - MR} y2={y} stroke={gridColor} strokeWidth={0.5} />
+          <text x={ML - 8} y={y + 3} textAnchor="end" fontSize={10} fill={textColor}>
+            {(ymax - (i / 5) * ySpan).toFixed(2)}
+          </text>
+        </g>
+      })}
+      {Array.from({ length: 6 }, (_, i) => {
+        const x = ML + (i / 5) * PW
+        return <g key={`gx${i}`}>
+          <line x1={x} y1={MT} x2={x} y2={MT + PH} stroke={gridColor} strokeWidth={0.5} />
+          <text x={x} y={H - MB + 15} textAnchor="middle" fontSize={10} fill={textColor}>
+            {(tmin + (i / 5) * tSpan).toFixed(1)}
+          </text>
+        </g>
+      })}
+      {/* оси */}
+      <line x1={ML} y1={MT} x2={ML} y2={MT + PH} stroke={axisColor} strokeWidth={1} />
+      <line x1={ML} y1={MT + PH} x2={W - MR} y2={MT + PH} stroke={axisColor} strokeWidth={1} />
+      {/* линии данных */}
+      {lines.map(l => (
+        <polyline key={l.name} points={l.points} fill="none" stroke={l.color} strokeWidth={1.5} />
+      ))}
+    </svg>
   )
 }
 
@@ -377,34 +467,11 @@ export default function App() {
           </div>
           {/* график */}
           <div style={{
-            flex: 1, borderRadius: 8, padding: 12, overflow: 'auto',
-            background: dark ? 'var(--theme-background-primary, #141925)' : '#fff',
-            border: '1px solid var(--theme-background-secondary, #ccc)',
+            flex: 1, borderRadius: 8, padding: 8, overflow: 'hidden',
+            background: dark ? '#0d1117' : '#fff',
+            border: '1px solid rgba(128,128,128,0.3)',
           }}>
-            {trace && trace.decimated && trace.decimated.times.length > 0 ? (
-              <LineChart
-                width={Math.max(800, window.innerWidth - 80)} height={Math.max(400, window.innerHeight - 160)}
-                data={trace.decimated.times.map((t, i) => {
-                  const row: Record<string, number | undefined> = { t: Number(t.toFixed(3)) }
-                  for (const n of trace.names) {
-                    const v = trace.decimated.series[n][i]
-                    row[n] = v === null ? undefined : v
-                  }
-                  return row
-                })}
-                categoryField="t"
-                series={trace.names
-                  .filter(n => !hiddenSeries.has(n))
-                  .map((n, i) => ({
-                    fieldName: n, label: n,
-                    color: SERIES_COLORS[trace.names.indexOf(n) % SERIES_COLORS.length],
-                  }))}
-                showGridX showGridY />
-            ) : (
-              <div style={{ textAlign: 'center', padding: 40, opacity: 0.5 }}>
-                нет данных — запустите модель или подождите накопления точек
-              </div>
-            )}
+            <SvgChart trace={trace} hidden={hiddenSeries} dark={dark} />
           </div>
         </div>
       )}

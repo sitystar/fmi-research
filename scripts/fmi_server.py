@@ -174,7 +174,8 @@ def api_run(body: dict):
     run_state.model = entry.name
     run_state.started_at = datetime.now().isoformat(timespec="seconds")
     run_state.append_log(f"=== запуск {entry.name}, trace: {run_state.run_dir}/data.csv ===\n")
-    run_state.proc = subprocess.Popen(argv, stdout=logf, stderr=subprocess.STDOUT, env=env, cwd=core.ROOT)
+    run_state.proc = subprocess.Popen(argv, stdout=logf, stderr=subprocess.STDOUT, env=env, cwd=core.ROOT,
+                                       preexec_fn=os.setsid)  # своя process group
     threading.Thread(target=_tail_proc, args=(run_state.proc, os.path.join(run_state.run_dir, "fmitb.log")), daemon=True).start()
     if duration > 0:
         threading.Thread(target=_watchdog, args=(run_state.proc, duration), daemon=True).start()
@@ -260,21 +261,18 @@ def _seed_models():
                 print(f"seed: {d}")
 
 
-def _cleanup(signum, frame):
-    """SIGTERM/SIGINT: остановить FMITerminalBlock и завершиться."""
+# uvicorn перехватывает SIGTERM/SIGINT — cleanup через shutdown event
+@app.on_event("shutdown")
+def _shutdown_cleanup():
+    """Остановить FMITerminalBlock при завершении сервера (любой причиной)."""
     proc = run_state.proc
     if proc and proc.poll() is None:
         proc.terminate()
         try:
-            proc.wait(5)
+            proc.wait(3)
         except Exception:
             proc.kill()
-    import sys
-    sys.exit(0)
-
-
-signal.signal(signal.SIGTERM, _cleanup)
-signal.signal(signal.SIGINT, _cleanup)
+    os.system("kill -9 $(pgrep -f FMITerminalBlock) 2>/dev/null")
 
 if __name__ == "__main__":
     _seed_models()
