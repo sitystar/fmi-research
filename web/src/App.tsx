@@ -51,7 +51,7 @@ export default function App() {
   const [models, setModels] = useState<ModelInfo[]>([])
   const [sel, setSel] = useState<ModelInfo | null>(null)
   const [status, setStatus] = useState<Status | null>(null)
-  const [params, setParams] = useState({ out_port: 1499, in_port: 1500, duration: 0, lookahead: 1, loglevel: 'info' })
+  const [params, setParams] = useState({ out_port: 1499, in_port: 1500, duration: 0, lookahead: 1, loglevel: 'info', host: '127.0.0.1' })
   const [logs, setLogs] = useState<string[]>([])
   const [drawer, setDrawer] = useState(false)
   const [trace, setTrace] = useState<Trace | null>(null)
@@ -205,6 +205,17 @@ export default function App() {
 
             <div style={panel()}><b>Параметры запуска</b>
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <label title="IP-адрес или имя ПК, где запущен Flogic (оркестратор). По умолчанию: этот же ПК."
+                       style={{ cursor: 'help' }}>
+                  Адрес Flogic<br />
+                  <input value={params.host}
+                         onChange={e => setParams(p => ({ ...p, host: e.target.value }))}
+                         placeholder="127.0.0.1"
+                         style={{ width: 120, padding: '4px 8px', borderRadius: 4,
+                                  border: '1px solid var(--theme-background-secondary, #ccc)',
+                                  background: 'var(--theme-background-primary, #fff)',
+                                  color: 'inherit', fontSize: 13 }} />
+                </label>
                 <label>Порт приёма<br />
                   <InputNumber value={params.out_port} min={1} max={65535}
                                onChange={v => setParams(p => ({ ...p, out_port: Number(v) }))} /></label>

@@ -126,21 +126,21 @@ def build_argv(entry, inputs, outputs, params):
     """Аргументы FMITerminalBlock (эквивалент scripts/run_fmu.sh)."""
     argv = [FMITB, f"fmu.path=file://{entry.dir}", f"fmu.name={entry.name}",
             "app.startTime=0", "app.directOutputDependency=1"]
-    for i, (v, t) in enumerate(inputs):
+    for i, (v, t, _) in enumerate(inputs):
         argv += [f"in.0.{i}={v}", f"in.0.{i}.type={t}",
-                 "in.0.protocol=CompactASN.1-TCP", f"in.0.addr=127.0.0.1:{params['in_port']}"]
-    for i, (v, t) in enumerate(outputs):
+                 "in.0.protocol=CompactASN.1-TCP", f"in.0.addr={params.get('host', '127.0.0.1')}:{params['in_port']}"]
+    for i, (v, t, _) in enumerate(outputs):
         argv += [f"out.0.{i}={v}", f"out.0.{i}.type={t}",
-                 "out.0.protocol=CompactASN.1-TCP", f"out.0.addr=127.0.0.1:{params['out_port']}"]
+                 "out.0.protocol=CompactASN.1-TCP", f"out.0.addr={params.get('host', '127.0.0.1')}:{params['out_port']}"]
     argv += [f"app.lookAheadTime={params['lookahead']}", f"app.logLevel={params['loglevel']}"]
     return argv
 
 
-def ports_ready(out_port, in_port):
+def ports_ready(out_port, in_port, host="127.0.0.1"):
     for p in (out_port, in_port):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(0.4)
-            if s.connect_ex(("127.0.0.1", p)) != 0:
+            if s.connect_ex((host, p)) != 0:
                 return False
     return True
 
