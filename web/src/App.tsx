@@ -56,6 +56,8 @@ export default function App() {
   const [drawer, setDrawer] = useState(false)
   const [trace, setTrace] = useState<Trace | null>(null)
   const [browse, setBrowse] = useState(false)
+  const [showParams, setShowParams] = useState(false)
+  const [paramEdits, setParamEdits] = useState<Record<string, string>>({})
   const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(null)
   const logRef = useRef<HTMLPreElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -84,7 +86,7 @@ export default function App() {
     if (!sel) return
     setNotice(null)
     try {
-      const r = await api.run({ model: sel.name, ...params })
+      const r = await api.run({ model: sel.name, ...params, param_overrides: Object.keys(paramEdits).length > 0 ? paramEdits : undefined })
       setLogs([])
       setNotice({ text: `Прогон запущен: ${r.run_dir}` })
     } catch (e) {
@@ -155,21 +157,70 @@ export default function App() {
           {/* модели: две раздельные секции */}
           <div style={{ width: 330, display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0 }}>
             {/* верхняя: таблица импортированных моделей (70%) */}
-            <div style={panel({ flex: 7, display: 'flex', flexDirection: 'column', minHeight: 0 })}>
-              <b style={{ marginBottom: 6 }}>Импортированные модели</b>
-              <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-                <Table
-                  data={models.map(m => ({ name: m.name, io: `${m.inputs.length}вх/${m.outputs.length}вых` }))}
-                  cols={[
-                    { title: 'Имя', name: 'name' },
-                    { title: 'вх/вых', name: 'io', width: 100 },
-                  ]}
-                />
+            <div style={{ flex: 7, position: 'relative', overflow: 'hidden', minHeight: 0 }}>
+              <div style={{
+                position: 'absolute', inset: 0,
+                transform: showParams ? 'translateX(100%)' : 'translateX(0)',
+                transition: 'transform 0.3s ease',
+                border: '1px solid var(--theme-background-secondary, rgba(128,128,128,.35))',
+                background: 'var(--theme-background-secondary, transparent)',
+                borderRadius: 8, padding: 12, display: 'flex', flexDirection: 'column',
+              }}>
+                <b style={{ marginBottom: 6 }}>Импортированные модели</b>
+                <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+                  <Table
+                    data={models.map(m => ({ name: m.name, io: `${m.inputs.length}вх/${m.outputs.length}вых` }))}
+                    cols={[
+                      { title: 'Имя', name: 'name' },
+                      { title: 'вх/вых', name: 'io', width: 100 },
+                    ]}
+                  />
+                </div>
+              </div>
+              <div style={{
+                position: 'absolute', inset: 0,
+                transform: showParams ? 'translateX(0)' : 'translateX(-100%)',
+                transition: 'transform 0.3s ease',
+                border: '1px solid var(--theme-background-secondary, rgba(128,128,128,.35))',
+                background: 'var(--theme-background-secondary, transparent)',
+                borderRadius: 8, padding: 12, display: 'flex', flexDirection: 'column',
+              }}>
+                <b style={{ marginBottom: 6 }}>Параметры: {sel?.name || '—'}</b>
+                <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {(sel?.parameters || []).map(p => (
+                    <label key={p.name} style={{ display: 'flex', flexDirection: 'column', gap: 2, fontSize: 13 }}>
+                      <span title={p.desc} style={{ cursor: 'help' }}>
+                        <b>{p.name}</b>{p.desc ? ` — ${p.desc}` : ''}
+                      </span>
+                      <Input
+                        value={paramEdits[p.name] ?? p.value}
+                        onChange={e => {
+                          const val = typeof e === 'string' ? e : e?.target?.value ?? String(e)
+                          setParamEdits(prev => ({ ...prev, [p.name]: val }))
+                        }}
+                      />
+                    </label>
+                  ))}
+                  {(!sel || !sel.parameters || sel.parameters.length === 0) && (
+                    <div style={{ opacity: 0.5, padding: 8 }}>параметров нет</div>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+                  <Button size="s" styleType="primary" onClick={() => setShowParams(false)}>Применить</Button>
+                  <Button size="s" styleType="secondary" onClick={() => setParamEdits({})}>Сбросить</Button>
+                </div>
               </div>
             </div>
             {/* нижняя: выбор модели для работы (30%, зафиксирована) */}
             <div style={panel({ flex: 3, display: 'flex', flexDirection: 'column', minHeight: 0 })}>
               <b style={{ marginBottom: 6 }}>Выбор модели</b>
+              {sel && sel.parameters && sel.parameters.length > 0 && (
+                <Button size="xs" styleType="secondary"
+                        onClick={() => setShowParams(!showParams)}
+                        style={{ marginBottom: 4 }}>
+                  {showParams ? '← К списку' : '⚙ Изменить параметры'}
+                </Button>
+              )}
               <div style={{ flex: 1, overflowY: 'auto', minHeight: 0, display: 'flex', flexDirection: 'column', gap: 3 }}>
                 {models.map(m => (
                   <Button key={m.name} size="xs"

@@ -80,7 +80,8 @@ def api_models():
     return [{"name": m.name,
              "dir": os.path.relpath(m.dir, core.ROOT),
              "inputs": [{"name": n, "type": t, "desc": d} for n, t, d in m.inputs],
-             "outputs": [{"name": n, "type": t, "desc": d} for n, t, d in m.outputs]}
+             "outputs": [{"name": n, "type": t, "desc": d} for n, t, d in m.outputs],
+             "parameters": [{"name": n, "value": v, "desc": d} for n, v, d in m.parameters]}
             for m in core.scan_models()]
 
 
@@ -150,7 +151,8 @@ def api_run(body: dict):
              in_port=int(body.get("in_port", 1500)),
              host=body.get("host", "127.0.0.1"),
              lookahead=float(body.get("lookahead", 1)),
-             loglevel=body.get("loglevel", "info"))
+             loglevel=body.get("loglevel", "info"),
+             param_overrides=body.get("param_overrides", {}))
     _params_cache.update(out_port=p["out_port"], in_port=p["in_port"], host=p["host"])
     duration = float(body.get("duration", 0) or 0)
 

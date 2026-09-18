@@ -2,11 +2,13 @@
 // Типы и обмен с локальным сервером (scripts/fmi_server.py)
 
 export interface Var { name: string; type: string; desc: string }
+export interface Param { name: string; value: string; desc: string }
 export interface ModelInfo {
   name: string
   dir: string
   inputs: Var[]
   outputs: Var[]
+  parameters: Param[]
 }
 export interface Status {
   root: string
