@@ -77,7 +77,7 @@ _apply_root(resolve_root())
 class ModelEntry:
     def __init__(self, fmu_dir):
         self.dir = fmu_dir
-        self.name, self.inputs, self.outputs = "", [], []
+        self.name, self.inputs, self.outputs, self.parameters = "", [], [], []
         self.parse()
 
     def parse(self):
@@ -93,6 +93,13 @@ class ModelEntry:
                 self.inputs.append(entry)
             elif v.get("causality") == "output":
                 self.outputs.append(entry)
+            elif v.get("causality") == "parameter":
+                start = ""
+                for ch in v:
+                    if ch.tag == "Real" and ch.get("start"):
+                        start = ch.get("start")
+                        break
+                self.parameters.append((v.get("name"), start, v.get("description") or ""))
 
 
 def scan_models():
@@ -133,6 +140,8 @@ def build_argv(entry, inputs, outputs, params):
         argv += [f"out.0.{i}={v}", f"out.0.{i}.type={t}",
                  "out.0.protocol=CompactASN.1-TCP", f"out.0.addr={params.get('host', '127.0.0.1')}:{params['out_port']}"]
     argv += [f"app.lookAheadTime={params['lookahead']}", f"app.logLevel={params['loglevel']}"]
+    for pname, pval in params.get("param_overrides", {}).items():
+        argv.append(f"in.default.{pname}={pval}")
     return argv
 
 

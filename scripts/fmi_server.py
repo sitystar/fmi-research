@@ -10,6 +10,7 @@ REST/WS API поверх fmi_core + раздача статики веб-инт�
 исключительно FMITerminalBlock.
 """
 import asyncio
+import signal
 import threading
 import os
 import subprocess
@@ -80,7 +81,8 @@ def api_models():
     return [{"name": m.name,
              "dir": os.path.relpath(m.dir, core.ROOT),
              "inputs": [{"name": n, "type": t, "desc": d} for n, t, d in m.inputs],
-             "outputs": [{"name": n, "type": t, "desc": d} for n, t, d in m.outputs]}
+             "outputs": [{"name": n, "type": t, "desc": d} for n, t, d in m.outputs],
+             "parameters": [{"name": n, "value": v, "desc": d} for n, v, d in m.parameters]}
             for m in core.scan_models()]
 
 
@@ -150,7 +152,8 @@ def api_run(body: dict):
              in_port=int(body.get("in_port", 1500)),
              host=body.get("host", "127.0.0.1"),
              lookahead=float(body.get("lookahead", 1)),
-             loglevel=body.get("loglevel", "info"))
+             loglevel=body.get("loglevel", "info"),
+             param_overrides=body.get("param_overrides", {}))
     _params_cache.update(out_port=p["out_port"], in_port=p["in_port"], host=p["host"])
     duration = float(body.get("duration", 0) or 0)
 
@@ -171,7 +174,8 @@ def api_run(body: dict):
     run_state.model = entry.name
     run_state.started_at = datetime.now().isoformat(timespec="seconds")
     run_state.append_log(f"=== запуск {entry.name}, trace: {run_state.run_dir}/data.csv ===\n")
-    run_state.proc = subprocess.Popen(argv, stdout=logf, stderr=subprocess.STDOUT, env=env, cwd=core.ROOT)
+    run_state.proc = subprocess.Popen(argv, stdout=logf, stderr=subprocess.STDOUT, env=env, cwd=core.ROOT,
+                                       preexec_fn=os.setsid)  # своя process group
     threading.Thread(target=_tail_proc, args=(run_state.proc, os.path.join(run_state.run_dir, "fmitb.log")), daemon=True).start()
     if duration > 0:
         threading.Thread(target=_watchdog, args=(run_state.proc, duration), daemon=True).start()
@@ -256,6 +260,19 @@ def _seed_models():
                 shutil.copytree(src, dst)
                 print(f"seed: {d}")
 
+
+# uvicorn перехватывает SIGTERM/SIGINT — cleanup через shutdown event
+@app.on_event("shutdown")
+def _shutdown_cleanup():
+    """Остановить FMITerminalBlock при завершении сервера (любой причиной)."""
+    proc = run_state.proc
+    if proc and proc.poll() is None:
+        proc.terminate()
+        try:
+            proc.wait(3)
+        except Exception:
+            proc.kill()
+    os.system("kill -9 $(pgrep -f FMITerminalBlock) 2>/dev/null")
 
 if __name__ == "__main__":
     _seed_models()
