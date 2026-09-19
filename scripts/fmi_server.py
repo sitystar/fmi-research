@@ -236,6 +236,54 @@ async def ws_logs(ws: WebSocket):
         pass
 
 
+@app.websocket("/api/trace/stream")
+async def ws_trace_stream(ws: WebSocket):
+    """Стриминг трейса в реальном времени: новые точки data.csv пачками."""
+    await ws.accept()
+    path = os.path.join(run_state.run_dir or "", "data.csv")
+    if not run_state.run_dir or not os.path.isfile(path):
+        await ws.send_json({"error": "нет активного прогона"})
+        await ws.close()
+        return
+
+    names = []
+    last_line = 0
+    try:
+        with open(path) as f:
+            while True:
+                lines = f.readlines()
+                # парсим новые строки
+                new_points = []
+                for line in lines[last_line:]:
+                    last_line += 1
+                    parts = line.strip().split(";")
+                    if len(parts) < 2 or parts[0] in ("time", "fmiReal", "fmiInteger", "fmiBoolean"):
+                        if parts[0] == "time":
+                            names = [p.strip('"') for p in parts[1:]]
+                        continue
+                    try:
+                        t = float(parts[0])
+                    except ValueError:
+                        continue
+                    point = {"t": t}
+                    for i, name in enumerate(names):
+                        val = parts[i + 1].strip('"') if i + 1 < len(parts) else ""
+                        if val:
+                            try:
+                                point[name] = float(val)
+                            except ValueError:
+                                pass
+                    new_points.append(point)
+
+                if new_points:
+                    await ws.send_json({"names": names, "points": new_points})
+                await asyncio.sleep(0.3)
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        print(f"trace stream error: {e}")
+
+
 # ---------------------------------------------------------------- статика веб-интерфейса
 for ui_dir in (os.path.join(core.ROOT, "web", "dist"),
                "/opt/fmi-coupling/ui"):

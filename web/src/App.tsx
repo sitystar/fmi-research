@@ -13,6 +13,7 @@ const panel = (extra?: React.CSSProperties): React.CSSProperties => ({
   borderRadius: 8, padding: 12, minWidth: 0, ...extra,
 })
 import { api, subscribeLogs, ModelInfo, Status, Trace } from './api'
+import RealtimeChart, { TraceBuffer, TracePoint } from './RealtimeChart'
 
 function BrowseDir({ onPick }: { onPick: (path: string) => void }) {
   const [path, setPath] = useState('/home')
@@ -150,6 +151,9 @@ export default function App() {
   const [browse, setBrowse] = useState(false)
   const [showParams, setShowParams] = useState(false)
   const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set())
+  const [traceBuffer, setTraceBuffer] = useState<TraceBuffer>(new Map())
+  const [traceNames, setTraceNames] = useState<string[]>([])
+  const traceBufRef = useRef<TraceBuffer>(new Map())
   const [paramEdits, setParamEdits] = useState<Record<string, string>>({})
   const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(null)
   const logRef = useRef<HTMLPreElement>(null)
@@ -170,6 +174,34 @@ export default function App() {
   }, [])
 
   useEffect(() => subscribeLogs(l => setLogs(prev => [...prev.slice(-1500), l])), [])
+
+  // реальный время: стриминг трейса через WS
+  useEffect(() => {
+    if (!drawer || !running) return
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws'
+    const ws = new WebSocket(`${proto}://${location.host}/api/trace/stream`)
+    ws.onmessage = e => {
+      try {
+        const msg = JSON.parse(e.data)
+        if (msg.error) return
+        if (msg.names) setTraceNames(msg.names)
+        if (msg.points && msg.points.length > 0) {
+          const buf = traceBufRef.current
+          for (const name of msg.names || traceNames) {
+            if (!buf.has(name)) buf.set(name, [])
+            const arr = buf.get(name)!
+            for (const p of msg.points) {
+              arr.push({ t: p.t, [name]: p[name] } as TracePoint)
+            }
+            // ограничение буфера
+            if (arr.length > 10000) arr.splice(0, arr.length - 10000)
+          }
+          setTraceBuffer(new Map(buf))
+        }
+      } catch { /* ignore */ }
+    }
+    return () => ws.close()
+  }, [drawer, status?.running]) // eslint-disable-line
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight
@@ -204,13 +236,27 @@ export default function App() {
   }
 
   const showTrace = async () => {
+    setDrawer(true)
+    // подгрузить накопленные данные
     try {
       const t = await api.trace()
       setTrace(t)
-      setDrawer(true)
-    } catch (e) {
-      setNotice({ text: `trace недоступен: ${e instanceof Error ? e.message : e}`, bad: true })
-    }
+      // заполнить буфер
+      const buf = new Map<string, TracePoint[]>()
+      for (const name of t.names) {
+        const arr: TracePoint[] = []
+        for (let i = 0; i < t.decimated.times.length; i++) {
+          const pt: TracePoint = { t: t.decimated.times[i] }
+          const v = t.decimated.series[name][i]
+          if (v !== null) pt[name] = v
+          arr.push(pt)
+        }
+        buf.set(name, arr)
+      }
+      traceBufRef.current = buf
+      setTraceBuffer(new Map(buf))
+      setTraceNames(t.names)
+    } catch { /* нет данных — покажем пустой график */ }
   }
 
   const running = status?.running
@@ -471,7 +517,8 @@ export default function App() {
             background: dark ? '#0d1117' : '#fff',
             border: '1px solid rgba(128,128,128,0.3)',
           }}>
-            <SvgChart trace={trace} hidden={hiddenSeries} dark={dark} />
+            <RealtimeChart dark={dark} hidden={hiddenSeries} onHiddenChange={setHiddenSeries}
+                           names={traceNames} buffer={traceBuffer} running={!!running} />
           </div>
         </div>
       )}
